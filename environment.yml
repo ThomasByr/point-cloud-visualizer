@@ -2,7 +2,7 @@
 # only python is installed
 # everything else is installed via pip
 
-name: sensors          # you should be able to change it
+name: o3d              # you should be able to change it
                        # just pay attention when pasting commands
 channels:
   - conda-forge
