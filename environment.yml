@@ -1,0 +1,11 @@
+# this is the very basic environment file
+# only python is installed
+# everything else is installed via pip
+
+name: sensors          # you should be able to change it
+                       # just pay attention when pasting commands
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10        # developed w/ 3.10.11
