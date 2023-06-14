@@ -3,7 +3,7 @@ import sys
 import json
 import signal
 
-from multiprocessing.pool import ThreadPool
+# from multiprocessing.pool import ThreadPool
 
 from typing import Any
 from datetime import datetime
@@ -87,12 +87,15 @@ class App:
     list of configs
     """
     start_ts = datetime.now()
-    thp = ThreadPool(processes=os.cpu_count() or 1) # should be the default but just in case ...
+    # thp = ThreadPool(processes=os.cpu_count() or 1) # should be the default but just in case ...
+
+    # for cfg in cfgs:
+    #   thp.apply_async(self.__load_points, (cfg,), callback=self.points.extend)
+    # thp.close()
+    # thp.join()
 
     for cfg in cfgs:
-      thp.apply_async(self.__load_points, (cfg,), callback=self.points.extend)
-    thp.close()
-    thp.join()
+      self.points.extend(self.__load_points(cfg))
 
     end_ts = datetime.now()
 
