@@ -22,7 +22,9 @@ __all__ = ["App"]
 
 class App:
 
-  def __init__(self, json_data_path: str = 'data/config.json') -> None:
+  def __init__(self, json_data_path: str = None) -> None:
+    json_data_path = json_data_path or self.__get_json_config_path()
+
     self.vis = visualization.Visualizer()
     self.vis.create_window(height=600, width=800)
 
@@ -34,9 +36,25 @@ class App:
 
     signal.signal(signal.SIGINT, self.__on_end) # register the signal handler
     signal.signal(signal.SIGTERM, self.__on_end)
+    log.info('Registered handlers')
 
     self.__setup(json_data_path) # setup the application
     log.info('Application setup complete')
+
+  def __get_json_config_path(self) -> str:
+    # search for the config.json file or any .json file recursively
+    found: set[str] = set()
+    for root, _, files in os.walk(os.getcwd()):
+      for file in files:
+        if file.endswith('.json'):
+          found.add(os.path.join(root, file))
+          if 'config.json' in file:
+            return os.path.join(root, file)
+
+    if len(found) == 0:
+      log.critical('No json config file found')
+      sys.exit(1)
+    return found.pop()
 
   def __on_end(self, signum: int, frame: Any) -> None:
     """
