@@ -60,7 +60,7 @@ You do not explicitly need a conda environment for the bot to run. But it is alw
 
 ```bash
 # Clone the repository
-git clone 
+git clone git@github.com:ThomasByr/point-cloud-visualizer.git
 cd point-cloud-visualizer
 ```
 
@@ -69,7 +69,7 @@ You can create and activate a conda environment with the following commands :
 ```bash
 # Create the environment
 conda env create -f environment.yml
-conda activate dsc
+conda activate o3d
 ```
 
 Then, install the dependencies :
