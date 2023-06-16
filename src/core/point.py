@@ -71,7 +71,8 @@ class Point(np.ndarray):
     defaults to `0`
 
     ## Optional Parameters
-    the following parameters are optional and can be passed as keyword arguments or as positional arguments
+    the following parameters are optional and can be passed as keyword arguments or as positional arguments\\
+    if passed as positional arguments, the missing keyword arguments must be passed in order 
     ```py
     >>> r, g, b : *int, (optional)
     ```
