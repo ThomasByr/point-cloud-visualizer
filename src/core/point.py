@@ -229,7 +229,13 @@ class Point(np.ndarray):
 
     try:
       r = int(match.group('r'))
+    except IndexError:
+      pass
+    try:
       g = int(match.group('g'))
+    except IndexError:
+      pass
+    try:
       b = int(match.group('b'))
     except IndexError:
       pass
@@ -254,7 +260,7 @@ class Point(np.ndarray):
     tuple[float, float, float] : (r, g, b) in range [0, 1]
     ```
     """
-    if self.__r is None or self.__g is None or self.__b is None:
+    if self.__r is None and self.__g is None and self.__b is None:
       return self.srcg(self.__id)
     else:
       r, g, b = get_maybe_rgb_color(self.__r, self.__g, self.__b)
