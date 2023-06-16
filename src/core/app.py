@@ -26,7 +26,7 @@ class App:
     json_data_path = json_data_path or self.__get_json_config_path()
 
     self.vis = visualization.Visualizer()
-    self.vis.create_window(height=600, width=800)
+    self.vis.create_window(window_name='Open3D', height=600, width=800)
 
     self.pc = geometry.PointCloud()
     self.points: list[Point] = []
