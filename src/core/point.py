@@ -14,7 +14,7 @@ class SomewhatRandomColorGenerator:
     self.__random = random.Random(seed)
     self.__passed: dict[int, tuple[float, float, float]] = {}
 
-  @lru_cache(maxsize=None)
+  @lru_cache(maxsize=256)
   def __call__(self, id: int = None) -> tuple[float, float, float]:
     id = id or -1
     try:
@@ -24,6 +24,7 @@ class SomewhatRandomColorGenerator:
       return self.__passed[id]
 
 
+@lru_cache(maxsize=256)
 def get_maybe_rgb_color(r: int, g: int, b: int) -> tuple[int, int, int]:
   if r is not None and g is not None and b is not None:
     return r, g, b

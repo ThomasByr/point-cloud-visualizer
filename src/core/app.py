@@ -17,7 +17,7 @@ from .point import *
 
 from ..log.logger import logger as log
 
-__all__ = ["App"]
+__all__ = ['App']
 
 
 class App:
