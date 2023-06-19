@@ -372,6 +372,7 @@ class PointFactory:
     - `{g}`: green value (int between 0 and 255)
     - `{b}`: blue value (int between 0 and 255)
     - `{id}`: unique identifier (int)
+    - `{?}`: any field that would be ignored
     """
     self.__fmt = fmt
     self.__make_groups()
