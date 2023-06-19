@@ -28,8 +28,8 @@ class App:
     self.vis = visualization.Visualizer()
     self.vis.create_window(window_name='Point Cloud Visualizer', height=600, width=800)
 
-    self.pc = geometry.PointCloud()
-    self.points: list[Point] = []
+    self.pc = geometry.PointCloud()   # point cloud geometry
+    self.points: list[Point] = list() # list of points (from all files)
     log.info('GUI up and ready 🚀')
 
     log.info('Setting up the application...')
@@ -69,7 +69,7 @@ class App:
     ```py
     >>> frame : Any
     ```
-    frame
+    current stack frame
     """
     print('\r', end='')
     log.warning(f'Received {signal.Signals(signum).name} signal ... Exiting')
@@ -86,25 +86,17 @@ class App:
     ```
     list of configs
     """
-    start_ts = datetime.now()
-    # thp = ThreadPool(processes=os.cpu_count() or 1) # should be the default but just in case ...
-
-    # for cfg in cfgs:
-    #   thp.apply_async(self.__load_points, (cfg,), callback=self.points.extend)
-    # thp.close()
-    # thp.join()
-
-    for cfg in cfgs:
-      self.points.extend(self.__load_points(cfg))
-
-    end_ts = datetime.now()
+    start_ts = datetime.now()                     # start timestamp
+    for cfg in cfgs:                              # get the points from all the files
+      self.points.extend(self.__load_points(cfg)) # load (somewhat slow)
+    end_ts = datetime.now()                       # end timestamp
 
     delta_seconds = (end_ts - start_ts).total_seconds()
     log.info(f'Parsed {len(self.points):_} points in {delta_seconds:.2f} s')
 
   @staticmethod
   def __load_points(cfg: Config) -> list[Point]:
-    points: list[Point] = []
+    points: list[Point] = list()
     offset = Point(*cfg.source_xyz)
     with open(cfg.file_path, 'r', encoding='utf-8') as f:
 
@@ -141,7 +133,7 @@ class App:
       raw_data = json.load(f)
     default: dict[str, Any] = raw_data['default']
     configs: list[dict[str, Any]] = raw_data['configs']
-    cfgs = [Config.from_json(cfg, **default) for cfg in configs]
+    cfgs = [Config.from_json(**default, json=cfg) for cfg in configs]
     # parse the files
     self.__parse_files(cfgs)
     # create the point cloud geometry
