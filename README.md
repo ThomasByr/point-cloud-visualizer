@@ -56,7 +56,7 @@ Then obviously, you will need the point clouds files in a text file format (csv,
 >
 > Please note we do not officially support Windows or MacOS, but we do provide some instructions for those who want to use it on these platforms.
 
-You do not explicitly need a conda environment for the bot to run. But it is always recommended nontheless, especially because the next LTS of Ubuntu won't let users pip-install anything without a virtual environment. At the time of writing, this app requires `python >= 3.9` to run.
+You do not explicitly need a conda environment for the bot to run. But it is always recommended nontheless, especially because the next LTS of Ubuntu won't let users pip-install anything without a virtual environment. At the time of writing, this app requires `python >= 3.10` to run.
 
 ```bash
 # Clone the repository
@@ -67,16 +67,9 @@ cd point-cloud-visualizer
 You can create and activate a conda environment with the following commands :
 
 ```bash
-# Create the environment
+# Create the environment and install the dependencies
 conda env create -f environment.yml
 conda activate o3d
-```
-
-Then, install the dependencies :
-
-```bash
-# Install the dependencies
-python -m pip install -r requirements.txt
 ```
 
 Finally, run the app by typing the following :
