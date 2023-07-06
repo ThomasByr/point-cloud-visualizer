@@ -24,7 +24,6 @@ class SomewhatRandomColorGenerator:
       return self.__passed[id]
 
 
-@lru_cache(maxsize=256)
 def get_maybe_rgb_color(r: int, g: int, b: int) -> tuple[int, int, int]:
   if r is not None and g is not None and b is not None:
     return r, g, b
