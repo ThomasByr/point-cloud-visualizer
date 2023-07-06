@@ -9,3 +9,6 @@ channels:
   - defaults
 dependencies:
   - python=3.10        # developed w/ 3.10.11
+  - pip                # pip is needed to install the rest
+  - pip:
+    - -r requirements.txt
