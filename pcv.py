@@ -37,8 +37,8 @@
 import os
 import sys
 
-if sys.version_info < (3, 9):
-  sys.exit("Python 3.9 or later is required.")
+if sys.version_info < (3, 10):
+  raise RuntimeError('This program requires Python 3.10 or later.')
 
 from src import *
 
