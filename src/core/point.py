@@ -1,9 +1,8 @@
 import re
-import numpy as np
-
+import random
 from functools import lru_cache
 
-import random
+import numpy as np
 
 __all__ = ['Point', 'PointFactory']
 
@@ -15,39 +14,42 @@ class SomewhatRandomColorGenerator:
     self.__passed: dict[int, tuple[float, float, float]] = {}
 
   @lru_cache(maxsize=256)
-  def __call__(self, id: int = None) -> tuple[float, float, float]:
-    id = id or -1
+  def __call__(self, cid: int = None) -> tuple[float, float, float]:
+    cid = cid or -1
     try:
-      return self.__passed[id]
+      return self.__passed[cid]
     except KeyError:
-      self.__passed[id] = self.__random.random(), self.__random.random(), self.__random.random()
-      return self.__passed[id]
+      self.__passed[cid] = self.__random.random(), self.__random.random(), self.__random.random()
+      return self.__passed[cid]
 
 
 def get_maybe_rgb_color(r: int, g: int, b: int) -> tuple[int, int, int]:
   if r is not None and g is not None and b is not None:
     return r, g, b
-  elif r is not None and g is not None:
+  if r is not None and g is not None:
     return r, g, g
-  elif r is not None and b is not None:
+  if r is not None and b is not None:
     return r, r, b
-  elif g is not None and b is not None:
+  if g is not None and b is not None:
     return b, g, b
-  elif r is not None:
+  if r is not None:
     return r, r, r
-  elif g is not None:
+  if g is not None:
     return g, g, g
-  elif b is not None:
+  if b is not None:
     return b, b, b
-  else:
-    raise ValueError('At least one of r, g, b must be not None')
+  raise ValueError('At least one of r, g, b must be not None')
 
 
 class Point(np.ndarray):
 
   srcg = SomewhatRandomColorGenerator()
+  __r: float
+  __g: float
+  __b: float
+  __id: int
 
-  def __new__(cls, x: float = 0, y: float = 0, z: float = 0, *args, **kwargs):
+  def __new__(cls, *args, x: float = 0, y: float = 0, z: float = 0, **kwargs):
     """
     create a new point\\
     inherits from `np.ndarray`
@@ -91,7 +93,7 @@ class Point(np.ndarray):
     r = kwargs.pop('r', None)
     g = kwargs.pop('g', None)
     b = kwargs.pop('b', None)
-    id = kwargs.pop('id', None)
+    cid = kwargs.pop('id', None)
 
     if r is None and len(args) > 0:
       r = args[0]
@@ -102,15 +104,15 @@ class Point(np.ndarray):
     if b is None and len(args) > 0:
       b = args[0]
       args = args[1:]
-    if id is None and len(args) > 0:
-      id = args[0]
+    if cid is None and len(args) > 0:
+      cid = args[0]
       args = args[1:]
 
     obj = np.array([x, y, z], dtype=float).view(cls)
     obj.__r: int = r
     obj.__g: int = g
     obj.__b: int = b
-    obj.__id: int = id
+    obj.__id: int = cid
     return obj
 
   @property
@@ -165,24 +167,24 @@ class Point(np.ndarray):
   def __str__(self):
     return self.__repr__()
 
-  def __getitem__(self, key: int | slice) -> float | np.ndarray:
-    if isinstance(key, slice):
-      return np.array([self[i] for i in range(*key.indices(len(self)))])
-    return super().__getitem__(key)
+  # def __getitem__(self, key: int | slice) -> float | np.ndarray:
+  #   if isinstance(key, slice):
+  #     return np.array([self[i] for i in range(*key.indices(len(self)))])
+  #   return super().__getitem__(key)
 
-  def __setitem__(self, key: int | slice, value: float | list[float]) -> None:
-    if isinstance(key, slice):
-      for i, v in zip(range(*key.indices(len(self))), value):
-        self[i] = v
-    else:
-      super().__setitem__(key, value)
+  # def __setitem__(self, key: int | slice, value: float | list[float]) -> None:
+  #   if isinstance(key, slice):
+  #     for i, v in zip(range(*key.indices(len(self))), value):
+  #       self[i] = v
+  #   else:
+  #     super().__setitem__(key, value)
 
-  def __delitem__(self, key: int | slice) -> None:
-    if isinstance(key, slice):
-      for i in range(*key.indices(len(self))):
-        del self[i]
-    else:
-      super().__delitem__(key)
+  # def __delitem__(self, key: int | slice) -> None:
+  #   if isinstance(key, slice):
+  #     for i in range(*key.indices(len(self))):
+  #       del self[i]
+  #   else:
+  #     super().__delitem__(key)
 
   @classmethod
   def from_factory(cls, string: str, fmt: str) -> 'Point':
@@ -214,18 +216,17 @@ class Point(np.ndarray):
     r: int = None
     g: int = None
     b: int = None
-    id: int = None
+    cid: int = None
 
-    match = re.match(fmt, string)
-    if match is None:
+    if (match := re.match(fmt, string)) is None:
       raise RuntimeError('invalid fmt string format : no match')
 
     try:
       x = float(match.group('x'))
       y = float(match.group('y'))
       z = float(match.group('z'))
-    except IndexError:
-      raise RuntimeError('invalid fmt string format : x, y, z required')
+    except IndexError as e:
+      raise RuntimeError('invalid fmt string format : x, y, z required') from e
 
     try:
       r = int(match.group('r'))
@@ -241,14 +242,14 @@ class Point(np.ndarray):
       pass
 
     try:
-      id = int(match.group('id'))
+      cid = int(match.group('id'))
     except IndexError:
       pass
 
     if x is None or y is None or z is None:
       raise ValueError(f'invalid string format from line \'{string}\' : x, y, z required')
 
-    return cls(x, y, z, r=r, g=g, b=b, id=id)
+    return cls(x, y, z, r=r, g=g, b=b, id=cid)
 
   def get_color(self) -> tuple[float, float, float]:
     """
@@ -262,9 +263,8 @@ class Point(np.ndarray):
     """
     if self.__r is None and self.__g is None and self.__b is None:
       return self.srcg(self.__id)
-    else:
-      r, g, b = get_maybe_rgb_color(self.__r, self.__g, self.__b)
-      return r / 255., g / 255., b / 255.
+    r, g, b = get_maybe_rgb_color(self.__r, self.__g, self.__b)
+    return r / 255., g / 255., b / 255.
 
   @staticmethod
   def new(x: float, y: float, z: float, o1: 'Point', o2: 'Point') -> 'Point':
@@ -377,15 +377,15 @@ class PointFactory:
     self.__make_groups()
 
   def __make_groups(self):
-    self.__fmt = self.__fmt.replace('{x}', '(?P<x>[-+]?[0-9]*\.?[0-9]+)')
-    self.__fmt = self.__fmt.replace('{y}', '(?P<y>[-+]?[0-9]*\.?[0-9]+)')
-    self.__fmt = self.__fmt.replace('{z}', '(?P<z>[-+]?[0-9]*\.?[0-9]+)')
+    self.__fmt = self.__fmt.replace('{x}', r'(?P<x>[-+]?[0-9]*\.?[0-9]+)')
+    self.__fmt = self.__fmt.replace('{y}', r'(?P<y>[-+]?[0-9]*\.?[0-9]+)')
+    self.__fmt = self.__fmt.replace('{z}', r'(?P<z>[-+]?[0-9]*\.?[0-9]+)')
 
-    self.__fmt = self.__fmt.replace('{r}', '(?P<r>[0-9]+)')
-    self.__fmt = self.__fmt.replace('{g}', '(?P<g>[0-9]+)')
-    self.__fmt = self.__fmt.replace('{b}', '(?P<b>[0-9]+)')
+    self.__fmt = self.__fmt.replace('{r}', r'(?P<r>[0-9]+)')
+    self.__fmt = self.__fmt.replace('{g}', r'(?P<g>[0-9]+)')
+    self.__fmt = self.__fmt.replace('{b}', r'(?P<b>[0-9]+)')
 
-    self.__fmt = self.__fmt.replace('{id}', '(?P<id>[-+]?[0-9]+)')
+    self.__fmt = self.__fmt.replace('{id}', r'(?P<id>[-+]?[0-9]+)')
 
     i = self.__fmt.count('{?}')
     while i > 0:

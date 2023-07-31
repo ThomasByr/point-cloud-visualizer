@@ -25,11 +25,11 @@ class App:
   def __init__(self, json_data_path: str = None) -> None:
     json_data_path = json_data_path or self.__get_json_config_path()
 
-    self.vis = visualization.Visualizer()
+    self.vis = visualization.Visualizer() # pylint: disable=no-member
     self.vis.create_window(window_name='Point Cloud Visualizer', height=600, width=800)
 
-    self.pc = geometry.PointCloud()   # point cloud geometry
-    self.points: list[Point] = list() # list of points (from all files)
+    self.pc = geometry.PointCloud() # point cloud geometry
+    self.points: list[Point] = []   # list of points (from all files)
     log.info('GUI up and ready 🚀')
 
     log.info('Setting up the application...')
@@ -56,7 +56,7 @@ class App:
       sys.exit(1)
     return found.pop()
 
-  def __on_end(self, signum: int, frame: Any) -> None:
+  def __on_end(self, signum: int, frame: Any) -> None: # pylint: disable=unused-argument
     """
     signal handler for the SIGINT signal
 
@@ -72,7 +72,7 @@ class App:
     current stack frame
     """
     print('\r', end='')
-    log.warning(f'Received {signal.Signals(signum).name} signal ... Exiting')
+    log.warning('Received %s signal ... Exiting', signal.Signals(signum).name)
     self.vis.destroy_window()
     sys.exit(0)
 
@@ -92,11 +92,11 @@ class App:
     end_ts = datetime.now()                       # end timestamp
 
     delta_seconds = (end_ts - start_ts).total_seconds()
-    log.info(f'Parsed {len(self.points):_} points in {delta_seconds:.2f} s')
+    log.info('Parsed %d points in %f s', len(self.points), round(delta_seconds, 3))
 
   @staticmethod
   def __load_points(cfg: Config) -> list[Point]:
-    points: list[Point] = list()
+    points: list[Point] = []
     offset = Point(*cfg.source_xyz)
     with open(cfg.file_path, 'r', encoding='utf-8') as f:
 
@@ -106,14 +106,14 @@ class App:
       for line in f.readlines()[start:]:
         try:
           points.append(factory(line) + offset)
-        except Exception as e:
-          log.critical(f'Failed to parse line: {line}\n{e}')
+        except Exception as e: # pylint: disable=broad-except
+          log.critical('Failed to parse line: %s\n%s', line, e)
           sys.exit(1)
     return points
 
   def __create_pc_geometry(self) -> None:
     self.pc.points = utility.Vector3dVector(self.points)
-    self.pc.colors = utility.Vector3dVector(list(map(lambda p: p.get_color(), self.points)))
+    self.pc.colors = utility.Vector3dVector(list(map(lambda p: p.get_color(), self.points))) # pylint: disable=bad-builtin
     self.vis.add_geometry(self.pc)
 
     log.info('Created point cloud geometry')

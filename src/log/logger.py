@@ -1,10 +1,9 @@
 import os
+import logging
 
 from dotenv import load_dotenv
 
-import logging
-
-from .formatter import *
+from .fmt import *
 
 __all__ = ['logger', 'log_lvl', 'console_handler', 'default_formatter']
 
@@ -14,7 +13,7 @@ __all__ = ['logger', 'log_lvl', 'console_handler', 'default_formatter']
 load_dotenv()
 DEBUG = os.getenv('DEBUG', 'False').lower() in {'true', '1', 'yes'}
 
-logger = logging.getLogger('me 🙂')
+logger = logging.getLogger('main')
 logger.setLevel(log_lvl := logging.DEBUG if DEBUG else logging.INFO)
 
 # create console handler with a higher log level
