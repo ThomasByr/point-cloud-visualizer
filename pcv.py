@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#! Useful Moderator
+#! PCV - point cloud visualizer
 #!
 #! Copyright (c) 2023, ThomasByr.
 #! AGPL-3.0-or-later (https://www.gnu.org/licenses/agpl-3.0.en.html)
@@ -34,7 +34,6 @@
 #! You should have received a copy of the GNU Affero General Public License
 #! along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import sys
 
 if sys.version_info < (3, 10):
@@ -42,6 +41,6 @@ if sys.version_info < (3, 10):
 
 from src import *
 
-if __name__ == "__main__":
+if __name__ == '__main__':
   app = App()
   app.run()
