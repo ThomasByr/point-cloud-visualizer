@@ -1,3 +1,6 @@
 -r requirements.txt
 
-pytest == 7.3.*
+hatch
+pytest
+pylint
+yapf
