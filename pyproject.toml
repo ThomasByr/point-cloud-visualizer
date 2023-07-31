@@ -1,0 +1,51 @@
+[build-system]
+requires      = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
+
+[project]
+name = "point-cloud-visualizer"
+authors = [{ name = "ThomasByr", email = "tbouyer2000@gmail.com" }]
+description = "A simple point cloud visualizer with Open3D"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+  "Operating System :: OS Independent",
+]
+dynamic = ["dependencies", "optional-dependencies", "version"]
+
+[project.urls]
+Documentation = "https://github.com/"
+Issues        = "https://github.com/"
+Source        = "https://github.com/"
+
+[tool.hatch.version]
+path = "src/version.py"
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements.txt"]
+
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+dev = ["requirements-dev.txt"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [".github", "docs"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.hatch.envs.dev]
+path     = ".hatch"
+features = ["dev"]
+
+[tool.hatch.envs.dev.scripts]
+test  = "python -m pytest"       # test with pytest, config via .pytest.ini
+lint  = "python -m pylint src"   # lint src with pylint, config via .pylintrc
+style = "python -m yapf -dr src" # check style with yapf, config via .style.yapf
+
+fmt = "python -m yapf -ir src" # format with yapf, config via .style.yapf
+
+check = ["test", "lint", "style"]
