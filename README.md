@@ -25,13 +25,20 @@ Just provide a `config.json` file (in a "data" directory for eg.) following the 
   },
   "configs": [
     {
-      "file_path": "in/Adapter1.csv",
-      "source_xyz": [700, 360, 100]
+      "file_path": "<path to Export Adapter file n°1>.csv",
+      "source_xyz": [<x1>, <y1>, <z1>]
+    },
+    {
+      "file_path": "<path to Export Adapter file n°2>.csv",
+      "source_xyz": [<x2>, <y2>, <z2>]
     },
     ...
   ]
 }
+
 ```
+
+`pattern` and `skip_first_line` fields can be overwritten in the `configs` array if needed. `source_xyz` is the position of the sensor in the scene.
 
 Then obviously, you will need the point clouds files in a text file format (csv, txt, etc.) with the corresponding format :
 
