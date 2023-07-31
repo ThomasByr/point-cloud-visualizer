@@ -2,12 +2,6 @@
 
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://docs.microsoft.com/en-us/windows/wsl/tutorials/gui-apps)
 [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
-[![GitHub license](https://img.shields.io/github/license/ThomasByr/point-cloud-visualizer)](https://github.com/ThomasByr/point-cloud-visualizer/blob/master/LICENSE)
-[![GitHub commits](https://badgen.net/github/commits/ThomasByr/point-cloud-visualizer)](https://GitHub.com/ThomasByr/point-cloud-visualizer/commit/)
-[![GitHub latest commit](https://badgen.net/github/last-commit/ThomasByr/point-cloud-visualizer)](https://gitHub.com/ThomasByr/point-cloud-visualizer/commit/)
-[![Maintenance](https://img.shields.io/badge/maintained%3F-yes-green.svg)](https://GitHub.com/ThomasByr/point-cloud-visualizer/graphs/commit-activity)
-
-[![GitHub version](https://badge.fury.io/gh/ThomasByr%2Fpoint-cloud-visualizer.svg)](https://github.com/ThomasByr/point-cloud-visualizer)
 [![Author](https://img.shields.io/badge/author-@ThomasByr-blue)](https://github.com/ThomasByr)
 
 1. [✏️ In short](#️-in-short)
