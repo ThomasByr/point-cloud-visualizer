@@ -6,9 +6,10 @@
 
 1. [✏️ In short](#️-in-short)
 2. [👩‍🏫 Usage \& Setup](#-usage--setup)
-3. [⚖️ License](#️-license)
-4. [🔄 Changelog](#-changelog)
-5. [🐛 Bugs and TODO](#-bugs-and-todo)
+3. [⚗️ Testing](#️-testing)
+4. [⚖️ License](#️-license)
+5. [🔄 Changelog](#-changelog)
+6. [🐛 Bugs and TODO](#-bugs-and-todo)
 
 ## ✏️ In short
 
@@ -71,6 +72,29 @@ Finally, run the app by typing the following :
 ```bash
 # Run app
 python pcv.py
+```
+
+## ⚗️ Testing
+
+Make sure you have installed the dependencies for testing :
+
+```bash
+# inside conda environment
+pip install -r requirements-dev.txt
+```
+
+Then, run the tests with the following command :
+
+```bash
+hatch run dev:check
+```
+
+or more manually :
+
+```bash
+python -m pytest
+python -m pylint src
+python -m yapf -dr src
 ```
 
 ## ⚖️ License
