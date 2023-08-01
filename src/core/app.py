@@ -109,6 +109,7 @@ class App:
           except Exception as e: # pylint: disable=broad-except
             log.critical('Failed to parse line: %s\n%s', line, e)
             sys.exit(1)
+
     except FileNotFoundError as e:
       log.error('Skipping unknown file: %s', e)
     except Exception as e: # pylint: disable=broad-except
