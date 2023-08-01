@@ -3,8 +3,6 @@ import sys
 import json
 import signal
 
-# from multiprocessing.pool import ThreadPool
-
 from typing import Any
 from datetime import datetime
 
@@ -44,7 +42,8 @@ class App:
   def __get_json_config_path(self) -> str:
     # search for the config.json file or any .json file recursively
     found: set[str] = set()
-    for root, _, files in os.walk(os.getcwd()):
+    for root, dirs, files in os.walk(os.getcwd(), topdown=True):
+      dirs[:] = list(filter(lambda d: not d.startswith(('.', '__')), dirs)) # ignore hidden directories
       for file in files:
         if file.endswith('.json'):
           found.add(os.path.join(root, file))
@@ -98,17 +97,23 @@ class App:
   def __load_points(cfg: Config) -> list[Point]:
     points: list[Point] = []
     offset = Point(*cfg.source_xyz)
-    with open(cfg.file_path, 'r', encoding='utf-8') as f:
+    try:
+      with open(cfg.file_path, 'r', encoding='utf-8') as f:
 
-      factory = PointFactory(cfg.pattern)     # just so that the fmt is not being parsed at every line
-      start = 1 if cfg.skip_first_line else 0 # skip the first line if needed (should be the same at casting bool to int)
+        factory = PointFactory(cfg.pattern)     # just so that the fmt is not being parsed at every line
+        start = 1 if cfg.skip_first_line else 0 # skip the first line if needed (should be the same at casting bool to int)
 
-      for line in f.readlines()[start:]:
-        try:
-          points.append(factory(line) + offset)
-        except Exception as e: # pylint: disable=broad-except
-          log.critical('Failed to parse line: %s\n%s', line, e)
-          sys.exit(1)
+        for line in f.readlines()[start:]:
+          try:
+            points.append(factory(line) + offset)
+          except Exception as e: # pylint: disable=broad-except
+            log.critical('Failed to parse line: %s\n%s', line, e)
+            sys.exit(1)
+    except FileNotFoundError as e:
+      log.error('Skipping unknown file: %s', e)
+    except Exception as e: # pylint: disable=broad-except
+      log.critical('Failed to read file: %s\n%s', cfg.file_path, e)
+      sys.exit(1)
     return points
 
   def __create_pc_geometry(self) -> None:
