@@ -4,6 +4,7 @@ from .fmt import *
 
 __all__ = ['init_logger']
 
+
 def init_logger(log_lvl: int = logging.INFO) -> logging.Logger:
   """
   Initializes the logger for the application
