@@ -46,10 +46,26 @@ def parser() -> ArgumentParser:
 
   parser = ArgumentParser(description=f'PCV - point cloud visualizer v{__version__}')
   parser.add_argument(
+    '-V',
+    '--version',
+    action='version',
+    version=f'%(prog)s v{__version__}',
+  )
+  parser.add_argument(
+    '-v',
+    '--verbose',
+    action='store_true',
+    default=False,
+    required=False,
+    help='print debug messages',
+  )
+  parser.add_argument(
     '-c',
     '--config',
     type=str,
+    metavar='PATH',
     default=None,
+    required=False,
     help='path to the json config file (since 0.1.2) (default: auto-detect)',
   )
   return parser
@@ -59,5 +75,5 @@ if __name__ == '__main__':
   from src import *
 
   args = parser().parse_args()
-  app = App(args.config)
+  app = App(args.config, args.verbose)
   app.run()
