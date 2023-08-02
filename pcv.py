@@ -35,12 +35,29 @@
 #! along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+from argparse import ArgumentParser
 
 if sys.version_info < (3, 10):
   raise RuntimeError('This program requires Python 3.10 or later.')
 
-from src import *
+
+def parser() -> ArgumentParser:
+  from src.version import __version__
+
+  parser = ArgumentParser(description=f'PCV - point cloud visualizer v{__version__}')
+  parser.add_argument(
+    '-c',
+    '--config',
+    type=str,
+    default=None,
+    help='path to the json config file (since 0.1.2) (default: auto-detect)',
+  )
+  return parser
+
 
 if __name__ == '__main__':
-  app = App()
+  from src import *
+
+  args = parser().parse_args()
+  app = App(args.config)
   app.run()
