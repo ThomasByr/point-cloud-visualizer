@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import signal
+import logging
 
 from typing import Any
 from datetime import datetime
@@ -13,31 +14,38 @@ from open3d import utility
 from .config import Config
 from .point import *
 
-from ..log.logger import logger as log
+from ..log.logger import init_logger
 
 __all__ = ['App']
 
 
 class App:
 
-  def __init__(self, json_data_path: str = None) -> None:
+  def __init__(self, json_data_path: str = None, verbose: bool = False) -> None:
+    log_lvl = logging.DEBUG if verbose else logging.INFO
+    self.log = init_logger(log_lvl)
+
     json_data_path = json_data_path or self.__get_json_config_path()
+    self.log.debug('Received json config file path (%s)', json_data_path)
+    if not os.path.isfile(json_data_path):
+      self.log.critical('Invalid json config file path supplied (%s)', json_data_path)
+      sys.exit(1)
 
     self.vis = visualization.Visualizer() # pylint: disable=no-member
     self.vis.create_window(window_name='Point Cloud Visualizer', height=600, width=800)
 
     self.pc = geometry.PointCloud() # point cloud geometry
     self.points: list[Point] = []   # list of points (from all files)
-    log.info('GUI up and ready 🚀')
+    self.log.info('GUI up and ready 🚀')
 
-    log.info('Setting up the application...')
+    self.log.info('Setting up the application...')
 
     signal.signal(signal.SIGINT, self.__on_end) # register the signal handler
     signal.signal(signal.SIGTERM, self.__on_end)
-    log.info('Registered handlers')
+    self.log.info('Registered handlers')
 
     self.__setup(json_data_path) # setup the application
-    log.info('Application setup complete')
+    self.log.info('Application setup complete')
 
   def __get_json_config_path(self) -> str:
     # search for the config.json file or any .json file recursively
@@ -51,7 +59,7 @@ class App:
             return os.path.join(root, file)
 
     if len(found) == 0:
-      log.critical('No json config file found')
+      self.log.critical('No json config file found in file tree')
       sys.exit(1)
     return found.pop()
 
@@ -71,7 +79,7 @@ class App:
     current stack frame
     """
     print('\r', end='')
-    log.warning('Received %s signal ... Exiting', signal.Signals(signum).name)
+    self.log.warning('Received %s signal ... Exiting', signal.Signals(signum).name)
     self.vis.destroy_window()
     sys.exit(0)
 
@@ -91,12 +99,12 @@ class App:
     end_ts = datetime.now()                       # end timestamp
 
     delta_seconds = (end_ts - start_ts).total_seconds()
-    log.info('Parsed %d points in %f s', len(self.points), round(delta_seconds, 3))
+    self.log.info('Parsed %d points in %f s', len(self.points), round(delta_seconds, 3))
 
-  @staticmethod
-  def __load_points(cfg: Config) -> list[Point]:
+  def __load_points(self, cfg: Config) -> list[Point]:
     points: list[Point] = []
     offset = Point(*cfg.source_xyz)
+    self.log.debug('Loading file: %s', cfg.file_path)
     try:
       with open(cfg.file_path, 'r', encoding='utf-8') as f:
 
@@ -107,14 +115,16 @@ class App:
           try:
             points.append(factory(line) + offset)
           except Exception as e: # pylint: disable=broad-except
-            log.critical('Failed to parse line: %s\n%s', line, e)
+            self.log.critical('Failed to parse line: %s\n%s', line, e)
             sys.exit(1)
 
     except FileNotFoundError as e:
-      log.error('Skipping unknown file: %s', e)
+      self.log.error('Skipping unknown file: %s', e)
+      return []
     except Exception as e: # pylint: disable=broad-except
-      log.critical('Failed to read file: %s\n%s', cfg.file_path, e)
+      self.log.critical('Failed to read file: %s\n%s', cfg.file_path, e)
       sys.exit(1)
+    self.log.debug('Loaded %d points from file: %s', len(points), cfg.file_path)
     return points
 
   def __create_pc_geometry(self) -> None:
@@ -122,7 +132,7 @@ class App:
     self.pc.colors = utility.Vector3dVector(list(map(lambda p: p.get_color(), self.points))) # pylint: disable=bad-builtin
     self.vis.add_geometry(self.pc)
 
-    log.info('Created point cloud geometry')
+    self.log.info('Created point cloud geometry')
 
   def __setup(self, json_data_path: str) -> None:
     """

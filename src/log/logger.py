@@ -1,24 +1,28 @@
-import os
 import logging
-
-from dotenv import load_dotenv
 
 from .fmt import *
 
-__all__ = ['logger', 'log_lvl', 'console_handler', 'default_formatter']
+__all__ = ['init_logger']
 
-# we load the env variables here so that we can use them in the logger
-# because this file is imported in the main file first,
-# we can't load the env variables in the main file
-load_dotenv()
-DEBUG = os.getenv('DEBUG', 'False').lower() in {'true', '1', 'yes'}
+def init_logger(log_lvl: int = logging.INFO) -> logging.Logger:
+  """
+  Initializes the logger for the application
 
-logger = logging.getLogger('main')
-logger.setLevel(log_lvl := logging.DEBUG if DEBUG else logging.INFO)
+  ## Parameters
+  - `log_lvl` - int, (optional)
+  the logging level (see `logging` module for more info)
+  defaults to `logging.INFO`
 
-# create console handler with a higher log level
-console_handler = logging.StreamHandler()
-console_handler.setLevel(log_lvl)
-console_handler.setFormatter(default_formatter := UsefulFormatter())
+  ## Returns
+  `logging.Logger` - a new logger on the root level
+  """
+  logger = logging.getLogger()
+  logger.setLevel(log_lvl)
 
-logger.addHandler(console_handler)
+  # create console handler with a higher log level
+  console_handler = logging.StreamHandler()
+  console_handler.setLevel(log_lvl)
+  console_handler.setFormatter(UsefulFormatter())
+
+  logger.addHandler(console_handler)
+  return logger
