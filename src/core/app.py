@@ -128,7 +128,7 @@ class App:
     return points
 
   def __create_pc_geometry(self) -> None:
-    self.pc.points = utility.Vector3dVector(self.points)
+    self.pc.points = utility.Vector3dVector(list(map(lambda p: p.get_xyz(), self.points)))   # pylint: disable=bad-builtin
     self.pc.colors = utility.Vector3dVector(list(map(lambda p: p.get_color(), self.points))) # pylint: disable=bad-builtin
     self.vis.add_geometry(self.pc)
 

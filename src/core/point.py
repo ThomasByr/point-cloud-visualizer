@@ -44,75 +44,22 @@ def get_maybe_rgb_color(r: int, g: int, b: int) -> tuple[int, int, int]:
 class Point(np.ndarray):
 
   srcg = SomewhatRandomColorGenerator()
-  __r: float
-  __g: float
-  __b: float
-  __id: int
 
-  def __new__(cls, *args, x: float = 0, y: float = 0, z: float = 0, **kwargs):
+  def __new__(cls, x: float = 0, y: float = 0, z: float = 0, r: int = None, g: int = None, b: int = None, cid: int = None):
     """
     create a new point\\
     inherits from `np.ndarray`
-    
-    ## Parameters
-    ```py
-    >>> x : float, (optional)
-    ```
-    x coordinate\\
-    defaults to `0`
-    ```py
-    >>> y : float, (optional)
-    ```
-    y coordinate\\
-    defaults to `0`
-    ```py
-    >>> z : float, (optional)
-    ```
-    z coordinate\\
-    defaults to `0`
-
-    ## Optional Parameters
-    the following parameters are optional and can be passed as keyword arguments or as positional arguments\\
-    if passed as positional arguments, the missing keyword arguments must be passed in order 
-    ```py
-    >>> r, g, b : *int, (optional)
-    ```
-    red, green, blue color value\\
-    defaults to `None`
-    ```py
-    >>> id : int, (optional)
-    ```
-    id of the class the point belongs to\\
-    defaults to `None` or `-1`
 
     ## Returns
     ```py
     Point : new point
     ```
     """
-    r = kwargs.pop('r', None)
-    g = kwargs.pop('g', None)
-    b = kwargs.pop('b', None)
-    cid = kwargs.pop('id', None)
-
-    if r is None and len(args) > 0:
-      r = args[0]
-      args = args[1:]
-    if g is None and len(args) > 0:
-      g = args[0]
-      args = args[1:]
-    if b is None and len(args) > 0:
-      b = args[0]
-      args = args[1:]
-    if cid is None and len(args) > 0:
-      cid = args[0]
-      args = args[1:]
-
-    obj = np.array([x, y, z], dtype=float).view(cls)
-    obj.__r: int = r
-    obj.__g: int = g
-    obj.__b: int = b
-    obj.__id: int = cid
+    r = r or -1
+    g = g or -1
+    b = b or -1
+    cid = cid or -1
+    obj = np.array([x, y, z, r, g, b, cid], dtype=float).view(cls)
     return obj
 
   @property
@@ -147,25 +94,31 @@ class Point(np.ndarray):
 
   @property
   def r(self) -> int:
-    return self.__r
+    return self[3]
 
   @property
   def g(self) -> int:
-    return self.__g
+    return self[4]
 
   @property
   def b(self) -> int:
-    return self.__b
+    return self[5]
 
   @property
   def id(self) -> int:
-    return self.__id
+    return self[6]
 
   def __repr__(self):
     return f'Point({self.x}, {self.y}, {self.z}) @ {self.id} | {self.r}, {self.g}, {self.b}'
 
   def __str__(self):
     return self.__repr__()
+
+  def __eq__(self, other):
+    return np.array_equal(self[:3], other[:3])
+
+  def __ne__(self, other):
+    return not self == other
 
   # def __getitem__(self, key: int | slice) -> float | np.ndarray:
   #   if isinstance(key, slice):
@@ -249,7 +202,7 @@ class Point(np.ndarray):
     if x is None or y is None or z is None:
       raise ValueError(f'invalid string format from line \'{string}\' : x, y, z required')
 
-    return cls(x, y, z, r=r, g=g, b=b, id=cid)
+    return cls(x, y, z, r, g, b, cid)
 
   def get_color(self) -> tuple[float, float, float]:
     """
@@ -261,99 +214,21 @@ class Point(np.ndarray):
     tuple[float, float, float] : (r, g, b) in range [0, 1]
     ```
     """
-    if self.__r is None and self.__g is None and self.__b is None:
-      return self.srcg(self.__id)
-    r, g, b = get_maybe_rgb_color(self.__r, self.__g, self.__b)
+    if all(self[3:6] < 0):
+      return self.srcg(self.id)
+    r, g, b = get_maybe_rgb_color(self.r, self.g, self.b)
     return r / 255., g / 255., b / 255.
 
-  @staticmethod
-  def new(x: float, y: float, z: float, o1: 'Point', o2: 'Point') -> 'Point':
+  def get_xyz(self) -> np.ndarray:
     """
-    creates a new point from a new x, y, z and the data from either o1 or o2 from wich ever is not None
-
-    ## Parameters
-    ```py
-    >>> x : float
-    ```
-    new x coordinate
-    ```py
-    >>> y : float
-    ```
-    new y coordinate
-    ```py
-    >>> z : float
-    ```
-    new z coordinate
-    ```py
-    >>> o1 : Point
-    ```
-    point 1
-    ```py
-    >>> o2 : Point
-    ```
-    point 2
+    get xyz values
 
     ## Returns
     ```py
-    Point : new Point object
+    tuple[float, float, float] : (x, y, z)
     ```
     """
-    return Point(x, y, z, r=o1.r or o2.r, g=o1.g or o2.g, b=o1.b or o2.b, id=o1.id or o2.id)
-
-  # yapf: disable
-  def __add__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x + other.x, self.y + other.y, self.z + other.z, self, other)
-  def __sub__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x - other.x, self.y - other.y, self.z - other.z, self, other)
-  def __mul__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x * other.x, self.y * other.y, self.z * other.z, self, other)
-  def __truediv__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x / other.x, self.y / other.y, self.z / other.z, self, other)
-  def __floordiv__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x // other.x, self.y // other.y, self.z // other.z, self, other)
-  def __mod__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x % other.x, self.y % other.y, self.z % other.z, self, other)
-  def __pow__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x ** other.x, self.y ** other.y, self.z ** other.z, self, other)
-  def __lshift__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x << other.x, self.y << other.y, self.z << other.z, self, other)
-  def __rshift__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x >> other.x, self.y >> other.y, self.z >> other.z, self, other)
-  def __and__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x & other.x, self.y & other.y, self.z & other.z, self, other)
-  def __xor__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x ^ other.x, self.y ^ other.y, self.z ^ other.z, self, other)
-  def __or__(self, other: 'Point') -> 'Point':
-    return Point.new(self.x | other.x, self.y | other.y, self.z | other.z, self, other)
-  def __neg__(self) -> 'Point':
-    return Point(-self.x, -self.y, -self.z, r=self.r, g=self.g, b=self.b, id=self.id)
-  def __pos__(self) -> 'Point':
-    return Point(+self.x, +self.y, +self.z, r=self.r, g=self.g, b=self.b, id=self.id)
-  def __abs__(self) -> 'Point':
-    return Point(abs(self.x), abs(self.y), abs(self.z), r=self.r, g=self.g, b=self.b, id=self.id)
-  def __invert__(self) -> 'Point':
-    return Point(~self.x, ~self.y, ~self.z, r=self.r, g=self.g, b=self.b, id=self.id)
-  # yapf: enable
-
-  # yapf: disable
-  def __eq__(self, other: 'Point') -> bool:
-    return self.x == other.x and self.y == other.y and self.z == other.z
-  def __ne__(self, other: 'Point') -> bool:
-    return self.x != other.x or self.y != other.y or self.z != other.z
-  def __lt__(self, other: 'Point') -> bool:
-    return self.x < other.x and self.y < other.y and self.z < other.z
-  def __le__(self, other: 'Point') -> bool:
-    return self.x <= other.x and self.y <= other.y and self.z <= other.z
-  def __gt__(self, other: 'Point') -> bool:
-    return self.x > other.x and self.y > other.y and self.z > other.z
-  def __ge__(self, other: 'Point') -> bool:
-    return self.x >= other.x and self.y >= other.y and self.z >= other.z
-  def __bool__(self) -> bool:
-    return bool(self.x or self.y or self.z)
-  def __len__(self) -> int:
-    return 3
-  # yapf: enable
-
+    return self[:3]
 
 class PointFactory:
 
