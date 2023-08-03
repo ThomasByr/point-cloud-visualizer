@@ -71,6 +71,12 @@ class App:
     """
     if args.no_exe and not args.save:
       raise RuntimeError('Passing --no-exe without --save will do nothing')
+    if args.save and os.path.isdir(args.save):
+      raise RuntimeError(f'Invalid save path supplied : {args.save} is a directory')
+    if args.save and not os.path.exists(os.path.dirname(args.save)):
+      raise RuntimeError(f'Invalid save path supplied : parent directory of {args.save} does not exist')
+    if args.only and args.only <= 0:
+      raise RuntimeError(f'Invalid value for --only : {args.only} (should be > 0)')
 
   def __get_json_config_path(self) -> str:
     # search for the config.json file or any .json file recursively
