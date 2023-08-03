@@ -102,9 +102,10 @@ class App:
     self.log.info('Parsed %d points in %f s', len(self.points), round(delta_seconds, 3))
 
   def __load_points(self, cfg: Config) -> list[Point]:
-    points: list[Point] = []
-    offset = Point(*cfg.source_xyz, *([0] * 4))
-    self.log.debug('Loading file: %s', cfg.file_path)
+    points: list[Point] = []                    # list of points
+    offset = Point(*cfg.source_xyz, *([0] * 4)) # offset location (r,g,b,id to 0 to __add__)
+    basename = os.path.basename(cfg.file_path)  # basename for logging
+    self.log.debug('Loading file: ...%s', basename)
     try:
       with open(cfg.file_path, 'r', encoding='utf-8') as f:
 
@@ -122,9 +123,9 @@ class App:
       self.log.error('Skipping unknown file: %s', e)
       return []
     except Exception as e: # pylint: disable=broad-except
-      self.log.critical('Failed to read file: %s\n%s', cfg.file_path, e)
+      self.log.critical('Failed to read file: ...%s\n%s', basename, e)
       sys.exit(1)
-    self.log.debug('Loaded %d points from file: %s', len(points), cfg.file_path)
+    self.log.debug('Loaded %d points from file: ...%s', len(points), basename)
     return points
 
   def __create_pc_geometry(self) -> None:
