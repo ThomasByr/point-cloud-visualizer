@@ -81,6 +81,16 @@ Finally, run the app by typing the following :
 python pcv.py
 ```
 
+| argument                | hint                                              | required ? | default             |
+| ----------------------- | ------------------------------------------------- | ---------- | ------------------- |
+| `-h` or `--help`        | show help message and exit                        | ❔         |                     |
+| `-V` or `--version`     | show program's version number and exit            | ❔         |                     |
+| `-v` or `--verbose`     | increase output verbosity                         | ❌         |                     |
+| `-c` or `--cfg` [PATH]  | path to the config file                           | ❌         | auto detect in tree |
+| `-s` or `--save` [PATH] | path to .npy file                                 | ❌         | do not save scene   |
+| `--no-exe`              | do not execute the app (if `--save`)              | ❌         |                     |
+| `--only` [N]            | only parse the first N entries of the config file | ❌         | parse all entries   |
+
 ## ⚗️ Testing
 
 Make sure you have installed the dependencies for testing :
@@ -137,7 +147,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 Please read the [changelog](changelog.md) file for the full history !
 
 <details>
-    <summary> (click here to expand) </summary>
+  <summary>  Title for major version (click here to expand) </summary>
+
+**v0.1** first working version
+
+- implemented auto detect for the config file (basic recursive search in non-hidden directories)
+- added a proper cli
+- `--save`, `no-exe` and `--only` options in v0.1.3
 
 </details>
 
