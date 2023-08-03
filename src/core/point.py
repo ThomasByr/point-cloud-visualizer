@@ -45,7 +45,16 @@ class Point(np.ndarray):
 
   srcg = SomewhatRandomColorGenerator()
 
-  def __new__(cls, x: float = 0, y: float = 0, z: float = 0, r: int = None, g: int = None, b: int = None, cid: int = None):
+  def __new__(
+    cls,
+    x: float = 0,
+    y: float = 0,
+    z: float = 0,
+    r: int = None,
+    g: int = None,
+    b: int = None,
+    cid: int = None,
+  ):
     """
     create a new point\\
     inherits from `np.ndarray`
@@ -229,6 +238,7 @@ class Point(np.ndarray):
     ```
     """
     return self[:3]
+
 
 class PointFactory:
 
