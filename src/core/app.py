@@ -103,7 +103,7 @@ class App:
 
   def __load_points(self, cfg: Config) -> list[Point]:
     points: list[Point] = []
-    offset = Point(*cfg.source_xyz)
+    offset = Point(*cfg.source_xyz, *([0] * 4))
     self.log.debug('Loading file: %s', cfg.file_path)
     try:
       with open(cfg.file_path, 'r', encoding='utf-8') as f:
