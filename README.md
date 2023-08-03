@@ -154,6 +154,7 @@ Please read the [changelog](changelog.md) file for the full history !
 - implemented auto detect for the config file (basic recursive search in non-hidden directories)
 - added a proper cli
 - `--save`, `no-exe` and `--only` options in v0.1.3
+- more checks for command line arguments
 
 </details>
 
