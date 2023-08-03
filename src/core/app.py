@@ -99,7 +99,7 @@ class App:
     end_ts = datetime.now()                       # end timestamp
 
     delta_seconds = (end_ts - start_ts).total_seconds()
-    self.log.info('Parsed %d points in %f s', len(self.points), round(delta_seconds, 3))
+    self.log.info('Parsed %s points in %.3f s', format(len(self.points), '_'), delta_seconds)
 
   def __load_points(self, cfg: Config) -> list[Point]:
     points: list[Point] = []                    # list of points
@@ -125,7 +125,7 @@ class App:
     except Exception as e: # pylint: disable=broad-except
       self.log.critical('Failed to read file: ...%s\n%s', basename, e)
       sys.exit(1)
-    self.log.debug('Loaded %d points from file: ...%s', len(points), basename)
+    self.log.debug('Loaded %s points from file: ...%s', format(len(points), '_'), basename)
     return points
 
   def __create_pc_geometry(self) -> None:
