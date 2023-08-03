@@ -61,12 +61,36 @@ def parser() -> ArgumentParser:
   )
   parser.add_argument(
     '-c',
-    '--config',
+    '--cfg',
     type=str,
     metavar='PATH',
     default=None,
     required=False,
     help='path to the json config file (since 0.1.2) (default: auto-detect)',
+  )
+  parser.add_argument(
+    '-s',
+    '--save',
+    type=str,
+    metavar='PATH',
+    default=None,
+    required=False,
+    help='save the current scene to a .npy file (since 0.1.2) (default: do not save)',
+  )
+  parser.add_argument(
+    '--no-exe',
+    action='store_true',
+    default=False,
+    required=False,
+    help='do not open open3D - valid when used with --save (since 0.1.3) (default: False)',
+  )
+  parser.add_argument(
+    '--only',
+    type=int,
+    metavar='N',
+    default=None,
+    required=False,
+    help='only parse the first N files registers in the config file (since 0.1.3) (default: parse all)',
   )
   return parser
 
@@ -75,5 +99,4 @@ if __name__ == '__main__':
   from src import *
 
   args = parser().parse_args()
-  app = App(args.config, args.verbose)
-  app.run()
+  app = App(args) # create and run app
