@@ -3,13 +3,17 @@ import sys
 import json
 import signal
 import logging
+from threading import Thread
 
 from typing import Any
 from datetime import datetime
 
+from argparse import Namespace
 from open3d import visualization
 from open3d import geometry
 from open3d import utility
+
+import numpy as np
 
 from .config import Config
 from .point import *
@@ -21,21 +25,29 @@ __all__ = ['App']
 
 class App:
 
-  def __init__(self, json_data_path: str = None, verbose: bool = False) -> None:
+  def __init__(self, args: Namespace) -> None:
+    self.__check_args(args)
+    verbose: bool = args.verbose
+    save: str | None = args.save
+    no_exe: bool = args.no_exe
+    json_data_path: str = args.cfg or self.__get_json_config_path()
+    only: int | None = args.only
+
     log_lvl = logging.DEBUG if verbose else logging.INFO
     self.log = init_logger(log_lvl)
-
-    json_data_path = json_data_path or self.__get_json_config_path()
     self.log.debug('Received json config file path (%s)', json_data_path)
     if not os.path.isfile(json_data_path):
       self.log.critical('Invalid json config file path supplied (%s)', json_data_path)
       sys.exit(1)
 
-    self.vis = visualization.Visualizer() # pylint: disable=no-member
-    self.vis.create_window(window_name='Point Cloud Visualizer', height=600, width=800)
+    self.vis: visualization.Visualizer | None = None # pylint: disable=no-member
+    self.pc: geometry.PointCloud | None = None       # point cloud geometry
+    if not no_exe:
+      self.vis = visualization.Visualizer()          # pylint: disable=no-member
+      self.pc = geometry.PointCloud()
+      self.vis.create_window(window_name='Point Cloud Visualizer', height=600, width=800)
 
-    self.pc = geometry.PointCloud() # point cloud geometry
-    self.points: list[Point] = []   # list of points (from all files)
+    self.points: list[Point] = [] # list of points (from all files)
     self.log.info('GUI up and ready 🚀')
 
     self.log.info('Setting up the application...')
@@ -44,8 +56,21 @@ class App:
     signal.signal(signal.SIGTERM, self.__on_end)
     self.log.info('Registered handlers')
 
-    self.__setup(json_data_path) # setup the application
+    self.__setup(json_data_path, save, no_exe, only) # setup the application
     self.log.info('Application setup complete')
+
+  def __check_args(self, args: Namespace) -> None:
+    """
+    check the arguments passed to the application
+
+    ## Parameters
+    ```py
+    >>> args : Namespace
+    ```
+    arguments passed to the application
+    """
+    if args.no_exe and not args.save:
+      raise RuntimeError('Passing --no-exe without --save will do nothing')
 
   def __get_json_config_path(self) -> str:
     # search for the config.json file or any .json file recursively
@@ -128,14 +153,26 @@ class App:
     self.log.debug('Loaded %s points from file: ...%s', format(len(points), '_'), basename)
     return points
 
-  def __create_pc_geometry(self) -> None:
-    self.pc.points = utility.Vector3dVector(list(map(lambda p: p.get_xyz(), self.points)))   # pylint: disable=bad-builtin
-    self.pc.colors = utility.Vector3dVector(list(map(lambda p: p.get_color(), self.points))) # pylint: disable=bad-builtin
-    self.vis.add_geometry(self.pc)
+  def __create_pc_geometry(self, no_exe: bool) -> None:
+    if not no_exe:
+      self.pc.points = utility.Vector3dVector(list(map(lambda p: p.get_xyz(), self.points)))   # pylint: disable=bad-builtin
+      self.pc.colors = utility.Vector3dVector(list(map(lambda p: p.get_color(), self.points))) # pylint: disable=bad-builtin
+      self.vis.add_geometry(self.pc)
 
-    self.log.info('Created point cloud geometry')
+      self.log.info('Created point cloud geometry')
 
-  def __setup(self, json_data_path: str) -> None:
+  def __save_pc(self, save: str | None = None) -> None:
+
+    def __save_npy(filepath: str):
+      np.save(filepath, np.array(self.points, dtype=object))
+      self.log.info('Saved point cloud to pc.npy')
+
+    # launch the save function in a separate thread
+    if save:
+      thread = Thread(target=__save_npy, args=(save,))
+      thread.start()
+
+  def __setup(self, json_data_path: str, save: bool, no_exe: bool, only: int | None) -> None:
     """
     setup the application
 
@@ -144,6 +181,18 @@ class App:
     >>> json_data_path : str
     ```
     path to the json data file
+    ```py
+    >>> save : bool
+    ```
+    whether to save the point cloud to a file with numpy
+    ```py
+    >>> no_exe : bool
+    ```
+    if save is true, whether to save the point cloud without running the gui
+    ```py
+    >>> only : int | None
+    ```
+    if not None, only parse the first `only` configs
     """
     # load the json file and create the configs
     with open(json_data_path, 'r', encoding='utf-8') as f:
@@ -151,19 +200,28 @@ class App:
     default: dict[str, Any] = raw_data['default']
     configs: list[dict[str, Any]] = raw_data['configs']
     cfgs = [Config.from_json(**default, json=cfg) for cfg in configs]
-    # parse the files
-    self.__parse_files(cfgs)
+    if only and only > len(cfgs):
+      self.log.warning('Only %s configs available, using all (to use all, omit --only)', len(cfgs))
+    # parse the files (slicing with None has no effect on small lists)
+    self.__parse_files(cfgs[:only])
     # create the point cloud geometry
-    self.__create_pc_geometry()
+    self.__create_pc_geometry(no_exe)
+    # save the point cloud if needed
+    self.__save_pc(save)
+    # run the gui
+    self.__run(no_exe)
 
-  def run(self) -> None:
+  def __run(self, no_exe: bool) -> None:
     """
     run the gui
     """
-    running = True
+    running = not no_exe
     while running:
       running = self.vis.poll_events()
       self.vis.update_geometry(self.pc)
       self.vis.update_renderer()
 
-    self.vis.destroy_window()
+    try:
+      self.vis.destroy_window()
+    except AttributeError: # --no-exe case
+      pass

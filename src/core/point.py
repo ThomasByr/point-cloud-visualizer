@@ -57,8 +57,13 @@ class Point(np.ndarray):
   ):
     """
     create a new point\\
-    inherits from `np.ndarray`
+    inherits from `np.ndarray`\\
 
+    ## Caution
+    When doing arithmetic operations, please make sure that `r`, `g`, `b` and `cid` of one of the points are `0`\\
+    Otherwise, you will loose information about the color and the class id of the point\\
+    `__eq__` and `__ne__` only compare the coordinates of the points
+  
     ## Returns
     ```py
     Point : new point
