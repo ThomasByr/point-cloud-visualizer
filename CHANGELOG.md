@@ -10,3 +10,4 @@
 - added a proper cli
 - `--save`, `no-exe` and `--only` options in v0.1.3
 - more checks for command line arguments
+- repo made public
