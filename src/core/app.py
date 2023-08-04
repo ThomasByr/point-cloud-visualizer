@@ -170,11 +170,12 @@ class App:
   def __save_pc(self, save: str | None = None) -> None:
 
     def __save_npy(filepath: str):
-      np.save(filepath, np.array(self.points, dtype=object))
+      # save point data but not object data
+      np.save(filepath, np.array(self.points, dtype=float), allow_pickle=False)
       self.log.info('Saved point cloud to pc.npy')
 
-    # launch the save function in a separate thread
     if save:
+      # launch the save function in a separate thread
       thread = Thread(target=__save_npy, args=(save,))
       thread.start()
 
