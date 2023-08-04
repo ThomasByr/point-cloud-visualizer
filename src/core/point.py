@@ -218,17 +218,24 @@ class Point(np.ndarray):
 
     return cls(x, y, z, r, g, b, cid)
 
-  def get_color(self) -> tuple[float, float, float]:
+  def get_color(self, cbid: bool = False) -> tuple[float, float, float]:
     """
     get rbg color values\\
     returns either the color values passed in the constructor or a random color based on the id
+
+    ## Parameters
+    ```py
+    >>> cbid : bool, (optional)
+    ```
+    if `True`, the color will be based on the id of the point,
+    otherwise, it will be the color passed in the constructor if any
 
     ## Returns
     ```py
     tuple[float, float, float] : (r, g, b) in range [0, 1]
     ```
     """
-    if all(self[3:6] < 0):
+    if cbid or all(self[3:6] < 0):
       return self.srcg(self.id)
     r, g, b = get_maybe_rgb_color(self.r, self.g, self.b)
     return r / 255., g / 255., b / 255.
