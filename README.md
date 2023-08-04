@@ -2,6 +2,13 @@
 
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://docs.microsoft.com/en-us/windows/wsl/tutorials/gui-apps)
 [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
+[![GitHub license](https://img.shields.io/github/license/ThomasByr/point-cloud-visualizer)](https://github.com/ThomasByr/point-cloud-visualizer/blob/master/LICENSE)
+[![GitHub commits](https://badgen.net/github/commits/ThomasByr/point-cloud-visualizer)](https://GitHub.com/ThomasByr/point-cloud-visualizer/commit/)
+[![GitHub latest commit](https://badgen.net/github/last-commit/ThomasByr/point-cloud-visualizer)](https://gitHub.com/ThomasByr/point-cloud-visualizer/commit/)
+[![Maintenance](https://img.shields.io/badge/maintained%3F-yes-green.svg)](https://GitHub.com/ThomasByr/point-cloud-visualizer/graphs/commit-activity)
+
+[![Python Package Conda&Hatch](https://github.com/ThomasByr/point-cloud-visualizer/actions/workflows/python-package-conda.yml/badge.svg)](https://github.com/ThomasByr/point-cloud-visualizer/actions/workflows/python-package-conda.yml)
+[![GitHub version](https://badge.fury.io/gh/ThomasByr%2Fpoint-cloud-visualizer.svg)](https://github.com/ThomasByr/point-cloud-visualizer)
 [![Author](https://img.shields.io/badge/author-@ThomasByr-blue)](https://github.com/ThomasByr)
 
 1. [✏️ In short](#️-in-short)
@@ -86,7 +93,7 @@ python pcv.py
 | `-h` or `--help`        | show help message and exit                        | ❔         |                     |
 | `-V` or `--version`     | show program's version number and exit            | ❔         |                     |
 | `-v` or `--verbose`     | increase output verbosity                         | ❌         |                     |
-| `-c` or `--cfg` [PATH]  | path to the config file                           | ❌         | auto detect in tree |
+| `-c` or `--cfg` [PATH]  | path to the config file                           | ✔️         | auto detect in tree |
 | `-s` or `--save` [PATH] | path to .npy file                                 | ❌         | do not save scene   |
 | `--no-exe`              | do not execute the app (if `--save`)              | ❌         |                     |
 | `--only` [N]            | only parse the first N entries of the config file | ❌         | parse all entries   |
@@ -155,6 +162,7 @@ Please read the [changelog](changelog.md) file for the full history !
 - added a proper cli
 - `--save`, `no-exe` and `--only` options in v0.1.3
 - more checks for command line arguments
+- repo made public
 
 </details>
 
