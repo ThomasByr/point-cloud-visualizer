@@ -27,16 +27,16 @@ Just provide a `config.json` file (in a "data" directory for eg.) following the 
 ```json
 {
   "default": {
-    "pattern": "{?},{x},{y},{z},{?},{?},{?},{id}",
+    "pattern": "{?},{x},{y},{z},{r},{g},{b},{id}",
     "skip_first_line": true
   },
   "configs": [
     {
-      "file_path": "<path to Export Adapter file n°1>.csv",
+      "file_path": "<path to file n°1>.csv",
       "source_xyz": [<x1>, <y1>, <z1>]
     },
     {
-      "file_path": "<path to Export Adapter file n°2>.csv",
+      "file_path": "<path to file n°2>.csv",
       "source_xyz": [<x2>, <y2>, <z2>]
     },
     ...
@@ -44,6 +44,19 @@ Just provide a `config.json` file (in a "data" directory for eg.) following the 
 }
 
 ```
+
+Allowed fields for the `pattern` property are :
+
+- `{?}` : anything we want to skip
+- `{x}` : x coordinate of the point (float)
+- `{y}` : y coordinate '''
+- `{z}` : z coordinate '''
+- `{r}` : red color component (int 0..=255)
+- `{g}` : green color component '''
+- `{b}` : blue color component '''
+- `{id}` : id of the object (int)(\*)
+
+(\*) _the id will be used to color the points in rendering if all color components are omitted_
 
 `pattern` and `skip_first_line` fields can be overwritten in the `configs` array if needed. `source_xyz` is the position of the sensor in the scene.
 
@@ -85,18 +98,22 @@ Finally, run the app by typing the following :
 
 ```bash
 # Run app
-python pcv.py
+python pcv.py -vis point_cloud.npy
 ```
 
-| argument                | hint                                              | required ? | default             |
-| ----------------------- | ------------------------------------------------- | ---------- | ------------------- |
-| `-h` or `--help`        | show help message and exit                        | ❔         |                     |
-| `-V` or `--version`     | show program's version number and exit            | ❔         |                     |
-| `-v` or `--verbose`     | increase output verbosity                         | ❌         |                     |
-| `-c` or `--cfg` [PATH]  | path to the config file                           | ✔️         | auto detect in tree |
-| `-s` or `--save` [PATH] | path to .npy file                                 | ❌         | do not save scene   |
-| `--no-exe`              | do not execute the app (if `--save`)              | ❌         |                     |
-| `--only` [N]            | only parse the first N entries of the config file | ❌         | parse all entries   |
+| argument (\*)               | hint                                                  | default             |
+| ----------------------- | ----------------------------------------------------- | ------------------- |
+| `-h` or `--help`        | show help message **and exit**                        |                     |
+| `-V` or `--version`     | show program's version number **and exit**            |                     |
+| `-v` or `--verbose`     | increase output verbosity                             |                     |
+| `-i` or `--cbid`        | force color by id (if color components are parsed)    |                     |
+| `-c` or `--cfg` [PATH]  | path to the config file                               | auto detect in tree |
+| `-f` or `--frac` [F]    | fraction of points to render (does not affect saving) | `1.0`               |
+| `-s` or `--save` [PATH] | path to .npy file                                     | do not save scene   |
+| `--no-exe`              | do not execute the app (if `--save`)                  |                     |
+| `--only` [N]            | only parse the first N entries of the config file     | parse all entries   |
+
+(\*) _[...] means the argument expects a value if specified ; but no arguments are required for the app to run_
 
 ## ⚗️ Testing
 
@@ -160,9 +177,14 @@ Please read the [changelog](changelog.md) file for the full history !
 
 - implemented auto detect for the config file (basic recursive search in non-hidden directories)
 - added a proper cli
-- `--save`, `no-exe` and `--only` options in v0.1.3
+- `--save`, `--no-exe` and `--only` options in v0.1.3
 - more checks for command line arguments
 - repo made public
+
+**v0.2** a more complete version
+
+- added `--cbid` and `--frac` to affect rendering _only_
+- the parser is no longer bloating the main file
 
 </details>
 
@@ -171,5 +193,7 @@ Please read the [changelog](changelog.md) file for the full history !
 **TODO** (first implementation version)
 
 - [ ] parallelize the point cloud loading from different files
+- [ ] add support for other file formats (las, ply, etc.)
+- [ ] `{X}`, `{Y}` and `{Z}` fields in pattern for the position of the sensor
 
 **Known Bugs** (latest fix)
