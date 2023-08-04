@@ -35,65 +35,9 @@
 #! along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from argparse import ArgumentParser
 
 if sys.version_info < (3, 10):
   raise RuntimeError('This program requires Python 3.10 or later.')
-
-
-def parser() -> ArgumentParser:
-  from src.version import __version__
-
-  parser = ArgumentParser(description=f'PCV - point cloud visualizer v{__version__}')
-  parser.add_argument(
-    '-V',
-    '--version',
-    action='version',
-    version=f'%(prog)s v{__version__}',
-  )
-  parser.add_argument(
-    '-v',
-    '--verbose',
-    action='store_true',
-    default=False,
-    required=False,
-    help='print debug messages',
-  )
-  parser.add_argument(
-    '-c',
-    '--cfg',
-    type=str,
-    metavar='PATH',
-    default=None,
-    required=False,
-    help='path to the json config file (since 0.1.2) (default: auto-detect)',
-  )
-  parser.add_argument(
-    '-s',
-    '--save',
-    type=str,
-    metavar='PATH',
-    default=None,
-    required=False,
-    help='save the current scene to a .npy file (since 0.1.2) (default: do not save)',
-  )
-  parser.add_argument(
-    '--no-exe',
-    action='store_true',
-    default=False,
-    required=False,
-    help='do not open open3D - valid when used with --save (since 0.1.3) (default: False)',
-  )
-  parser.add_argument(
-    '--only',
-    type=int,
-    metavar='N',
-    default=None,
-    required=False,
-    help='only parse the first N files registers in the config file (since 0.1.3) (default: parse all)',
-  )
-  return parser
-
 
 if __name__ == '__main__':
   from src import *
