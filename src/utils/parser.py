@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from typing_extensions import override
 
 from ..version import __version__
 
@@ -7,70 +8,66 @@ __all__ = ['parser']
 
 def parser() -> ArgumentParser:
 
-  p = ArgumentParser(description=f'PCV - point cloud visualizer v{__version__}')
-  p.add_argument(
+  class WeakArgsParser(ArgumentParser):
+
+    @override
+    def add_argument(self, *args, **kwargs) -> 'WeakArgsParser':
+      super().add_argument(*args, **kwargs)
+      return self
+
+    def add_non_required_argument(self, *args, **kwargs) -> 'WeakArgsParser':
+      kwargs['required'] = False
+      return self.add_argument(*args, **kwargs)
+
+    def add_true_false_argument(self, *args, **kwargs) -> 'WeakArgsParser':
+      kwargs['action'] = 'store_true'
+      if 'default' not in kwargs:
+        kwargs['default'] = False
+      return self.add_non_required_argument(*args, **kwargs)
+
+    def add_path_argument(self, *args, **kwargs) -> 'WeakArgsParser':
+      kwargs['type'] = str
+      kwargs['metavar'] = 'PATH'
+      if 'default' not in kwargs:
+        kwargs['default'] = None
+      return self.add_non_required_argument(*args, **kwargs)
+
+  return WeakArgsParser(description=f'PCV - point cloud visualizer v{__version__}').add_argument(
     '-V',
     '--version',
     action='version',
     version=f'%(prog)s v{__version__}',
-  )
-  p.add_argument(
+  ).add_true_false_argument(
     '-v',
     '--verbose',
-    action='store_true',
-    default=False,
-    required=False,
     help='print debug messages',
-  )
-  p.add_argument(
+  ).add_true_false_argument(
     '-i',
     '--cbid',
-    action='store_true',
-    default=False,
-    required=False,
     help='force color by id in rendering - if both color and id are parsed (since 0.2.1) (default: False)',
-  )
-  p.add_argument(
+  ).add_path_argument(
     '-c',
     '--cfg',
-    type=str,
-    metavar='PATH',
-    default=None,
-    required=False,
     help='path to the json config file (since 0.1.2) (default: auto-detect)',
-  )
-  p.add_argument(
+  ).add_non_required_argument(
     '-f',
     '--frac',
     type=float,
     metavar='F',
     default=None,
-    required=False,
     help=
     'fraction of the point cloud to be displayed - only affects rendering (since 0.2.1) (default: all points)',
-  )
-  p.add_argument(
+  ).add_path_argument(
     '-s',
     '--save',
-    type=str,
-    metavar='PATH',
-    default=None,
-    required=False,
     help='save the current scene to a .npy file (since 0.1.2) (default: do not save)',
-  )
-  p.add_argument(
+  ).add_true_false_argument(
     '--no-exe',
-    action='store_true',
-    default=False,
-    required=False,
     help='do not open open3D - valid when used with --save (since 0.1.3) (default: False)',
-  )
-  p.add_argument(
+  ).add_non_required_argument(
     '--only',
     type=int,
     metavar='N',
     default=None,
-    required=False,
     help='only parse the first N files registers in the config file (since 0.1.3) (default: parse all)',
   )
-  return p
