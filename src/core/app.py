@@ -46,11 +46,10 @@ class App:
       self.vis = visualization.Visualizer()          # pylint: disable=no-member
       self.pc = geometry.PointCloud()
       self.vis.create_window(window_name='Point Cloud Visualizer', height=600, width=800)
-
-    self.points: list[Point] = [] # list of points (from all files)
-    self.log.info('GUI up and ready 🚀')
+      self.log.info('GUI up and ready 🚀')
 
     self.log.info('Setting up the application...')
+    self.points: list[Point] = [] # list of points (from all files)
 
     signal.signal(signal.SIGINT, self.__on_end) # register the signal handler
     signal.signal(signal.SIGTERM, self.__on_end)
@@ -111,7 +110,10 @@ class App:
     """
     print('\r', end='')
     self.log.warning('Received %s signal ... Exiting', signal.Signals(signum).name)
-    self.vis.destroy_window()
+    try:
+      self.vis.destroy_window()
+    except AttributeError:                             # --no-exe case
+      pass
     sys.exit(0)
 
   def __parse_files(self, cfgs: list[Config]) -> None:
@@ -172,7 +174,7 @@ class App:
     def __save_npy(filepath: str):
       # save point data but not object data
       np.save(filepath, np.array(self.points, dtype=float), allow_pickle=False)
-      self.log.info('Saved point cloud to pc.npy')
+      self.log.info('Saved point cloud to %s', filepath)
 
     if save:
       # launch the save function in a separate thread
