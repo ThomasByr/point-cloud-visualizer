@@ -164,7 +164,7 @@ class App:
     points: list[Point] = []                    # list of points
     offset = Point(*cfg.source_xyz, *([0] * 4)) # offset location (r,g,b,id to 0 to __add__)
     basename = os.path.basename(cfg.file_path)  # basename for logging
-    self.log.debug('Loading file: ...%s', basename)
+    self.log.debug('Loading file: [...]/%s', basename)
     self.log.debug('Offset: %s', offset)
     try:
       with open(cfg.file_path, 'r', encoding='utf-8') as f:
@@ -183,23 +183,30 @@ class App:
       self.log.error('Skipping unknown file: %s', e)
       return []
     except Exception as e: # pylint: disable=broad-except
-      self.log.critical('Failed to read file: ...%s\n%s', basename, e)
+      self.log.critical('Failed to read file: %s\n%s', cfg.file_path, e)
       sys.exit(1)
-    self.log.debug('Loaded %s points from file: ...%s', format(len(points), '_'), basename)
+    self.log.debug('Loaded %s points from file: [...]/%s', format(len(points), '_'), basename)
     return points
 
   def __create_pc_geometry(self) -> None:
-    if not self.args.no_exe:
-      points = self.points
-      if self.args.frac:
-        size = int(len(self.points) * self.args.frac)
-        points = list(Point(*p) for p in self.device.choice(self.points, size, replace=False, shuffle=False))
-        self.log.info('Pulled %s points randomly', format(len(points), '_'))
-      self.pc.points = utility.Vector3dVector(map(lambda p: p.get_xyz(), points))                 # pylint: disable=bad-builtin
-      self.pc.colors = utility.Vector3dVector(map(lambda p: p.get_color(self.args.cbid), points)) # pylint: disable=bad-builtin
-      self.vis.add_geometry(self.pc)
+    if self.args.no_exe:
+      return
 
-      self.log.info('Created point cloud geometry')
+    start_ts = datetime.now() # start timestamp
+
+    points = self.points
+    if self.args.frac:
+      size = int(len(self.points) * self.args.frac)
+      points = list(Point(*p) for p in self.device.choice(self.points, size, replace=False, shuffle=False))
+      self.log.info('Pulled %s points randomly for rendering', format(len(points), '_'))
+    self.pc.points = utility.Vector3dVector(map(lambda p: p.get_xyz(), points))                 # pylint: disable=bad-builtin
+    self.pc.colors = utility.Vector3dVector(map(lambda p: p.get_color(self.args.cbid), points)) # pylint: disable=bad-builtin
+    self.vis.add_geometry(self.pc)
+
+    end_ts = datetime.now() # end timestamp
+    delta_seconds = (end_ts - start_ts).total_seconds()
+
+    self.log.info('Created point cloud geometry in %.3f s', delta_seconds)
 
   def __save_pc(self) -> None:
 
