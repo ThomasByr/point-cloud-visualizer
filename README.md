@@ -113,7 +113,7 @@ python pcv.py -vis point_cloud.npy
 | `--no-exe`              | do not execute the app (if `--save`)                  |                     |
 | `--only` [N]            | only parse the first N entries of the config file     | parse all entries   |
 
-(\*) _[...] means the argument expects a value if specified ; but no arguments are required for the app to run_
+(\*) _[...] means the argument expects a value if specified ; no arguments are required for the app to run_
 
 ## ⚗️ Testing
 
@@ -185,6 +185,7 @@ Please read the [changelog](changelog.md) file for the full history !
 
 - added `--cbid` and `--frac` to affect rendering _only_
 - the parser is no longer bloating the main file
+- fixed a bug where points where created with wrong color
 
 </details>
 
