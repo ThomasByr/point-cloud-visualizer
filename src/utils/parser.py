@@ -69,5 +69,5 @@ def parser() -> ArgumentParser:
     type=int,
     metavar='N',
     default=None,
-    help='only parse the first N files registers in the config file (since 0.1.3) (default: parse all)',
+    help='only parse the first N registered files in the config file (since 0.1.3) (default: parse all)',
   )
