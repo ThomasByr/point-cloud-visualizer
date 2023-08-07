@@ -16,3 +16,4 @@
 
 - added `--cbid` and `--frac` to affect rendering _only_
 - the parser is no longer bloating the main file
+- fixed a bug where points where created with wrong color
