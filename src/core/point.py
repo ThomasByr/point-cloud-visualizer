@@ -69,10 +69,10 @@ class Point(np.ndarray):
     Point : new point
     ```
     """
-    r = r or -1
-    g = g or -1
-    b = b or -1
-    cid = cid or -1
+    r = -1 if r is None else r
+    g = -1 if g is None else g
+    b = -1 if b is None else b
+    cid = -1 if cid is None else cid
     obj = np.array([x, y, z, r, g, b, cid], dtype=float).view(cls)
     return obj
 
