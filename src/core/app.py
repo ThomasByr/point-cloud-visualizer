@@ -165,6 +165,7 @@ class App:
     offset = Point(*cfg.source_xyz, *([0] * 4)) # offset location (r,g,b,id to 0 to __add__)
     basename = os.path.basename(cfg.file_path)  # basename for logging
     self.log.debug('Loading file: ...%s', basename)
+    self.log.debug('Offset: %s', offset)
     try:
       with open(cfg.file_path, 'r', encoding='utf-8') as f:
 
