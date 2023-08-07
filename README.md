@@ -45,7 +45,7 @@ Just provide a `config.json` file (in a "data" directory for eg.) following the 
 
 ```
 
-Allowed fields for the `pattern` property are :
+Allowed fields for the `pattern` property are (`x`, `y`, `z` are mandatory) :
 
 - `{?}` : anything we want to skip
 - `{x}` : x coordinate of the point (float)
