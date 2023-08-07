@@ -101,7 +101,7 @@ Finally, run the app by typing the following :
 python pcv.py -vis point_cloud.npy
 ```
 
-| argument (\*)               | hint                                                  | default             |
+| argument (\*)           | hint                                                  | default             |
 | ----------------------- | ----------------------------------------------------- | ------------------- |
 | `-h` or `--help`        | show help message **and exit**                        |                     |
 | `-V` or `--version`     | show program's version number **and exit**            |                     |
