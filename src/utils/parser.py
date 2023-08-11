@@ -111,5 +111,6 @@ def parser() -> ArgumentParser:
     type=parseIntSet,
     metavar='N',
     default=None,
-    help='only parse some registered files in the config file (since 0.2.2) (default: parse all)',
+    help='only parse some registered files in the config file from \'(<=)?N{[,-]N}*\' '
+    '(since 0.2.2) (default: parse all)',
   )
