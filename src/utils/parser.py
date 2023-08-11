@@ -1,3 +1,4 @@
+import sys
 from argparse import ArgumentParser
 from typing_extensions import override
 
@@ -6,11 +7,11 @@ from ..version import __version__
 __all__ = ['parser']
 
 
-def parseIntSet(nputstr='') -> set[int]:
+def parse_int_set(inputstr='') -> set[int]:
   selection: set[int] = set()
   invalid: set[str] = set()
   # tokens are comma separated values
-  tokens = [x.strip() for x in nputstr.split(',')]
+  tokens = [x.strip() for x in inputstr.split(',')]
   for i in tokens:
     if len(i) > 0:
       if i.startswith('<='):
@@ -27,7 +28,7 @@ def parseIntSet(nputstr='') -> set[int]:
         token = [int(k.strip()) for k in i.split('-')]
         if len(token) > 1:
           token.sort()
-          # we have items seperated by a dash
+          # we have items separated by a dash
           # try to build a valid range
           first = token[0]
           last = token[len(token) - 1]
@@ -41,7 +42,8 @@ def parseIntSet(nputstr='') -> set[int]:
 
   # report invalid tokens
   if len(invalid) > 0:
-    raise ValueError('Invalid set: ' + str(invalid))
+    print(f'Invalid set: {invalid}', file=sys.stderr) # print instead of raising an error
+    raise ValueError                                  # because argparse doesn't reraise
   return selection
 
 
@@ -108,7 +110,7 @@ def parser() -> ArgumentParser:
     help='do not open open3D - valid when used with --save (since 0.1.3) (default: False)',
   ).add_non_required_argument(
     '--only',
-    type=parseIntSet,
+    type=parse_int_set,
     metavar='N',
     default=None,
     help='only parse some registered files in the config file from \'(<=)?N{[,-]N}*\' '

@@ -3,6 +3,7 @@ import sys
 import json
 import signal
 import logging
+import random
 from threading import Thread
 
 from typing import Any
@@ -152,10 +153,10 @@ class App:
     ```
     list of configs
     """
-    start_ts = datetime.now()                     # start timestamp
+    start_ts = datetime.now()
     for cfg in cfgs:                              # get the points from all the files
       self.points.extend(self.__load_points(cfg)) # load (somewhat slow)
-    end_ts = datetime.now()                       # end timestamp
+    end_ts = datetime.now()
 
     delta_seconds = (end_ts - start_ts).total_seconds()
     self.log.info('Parsed %s points in %.3f s', format(len(self.points), '_'), delta_seconds)
@@ -192,20 +193,24 @@ class App:
     if self.args.no_exe:
       return
 
-    start_ts = datetime.now() # start timestamp
-
     points = self.points
     if self.args.frac:
-      size = int(len(self.points) * self.args.frac)
-      points = list(Point(*p) for p in self.device.choice(self.points, size, replace=False, shuffle=False))
-      self.log.info('Pulled %s points randomly for rendering', format(len(points), '_'))
+
+      _start_ts = datetime.now()
+      size = int(len(points) * self.args.frac)
+      points = random.sample(points, size)
+      _end_ts = datetime.now()
+      _delta_seconds = (_end_ts - _start_ts).total_seconds()
+      self.log.info('Pulled %s points randomly for rendering in %.3f s', format(len(points), '_'),
+                    _delta_seconds)
+
+    start_ts = datetime.now()
     self.pc.points = utility.Vector3dVector(map(lambda p: p.get_xyz(), points))                 # pylint: disable=bad-builtin
     self.pc.colors = utility.Vector3dVector(map(lambda p: p.get_color(self.args.cbid), points)) # pylint: disable=bad-builtin
     self.vis.add_geometry(self.pc)
+    end_ts = datetime.now()
 
-    end_ts = datetime.now() # end timestamp
     delta_seconds = (end_ts - start_ts).total_seconds()
-
     self.log.info('Created point cloud geometry in %.3f s', delta_seconds)
 
   def __save_pc(self) -> None:
