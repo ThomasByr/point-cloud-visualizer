@@ -95,7 +95,7 @@ class App:
       raise RuntimeError(f'Invalid save path supplied : {args.save} is a directory')
     if args.save and not os.path.exists(os.path.dirname(args.save)):
       raise RuntimeError(f'Invalid save path supplied : parent directory of {args.save} does not exist')
-    if args.only and args.only <= 0:
+    if args.only and any(map(lambda x: x <= 0, args.only)): # pylint: disable=bad-builtin
       raise RuntimeError(f'Invalid value for --only : {args.only} (should be > 0)')
     if args.frac and args.no_exe:
       raise RuntimeError('Passing --frac with --no-exe will have no effect')
@@ -229,10 +229,16 @@ class App:
     default: dict[str, Any] = raw_data['default']
     configs: list[dict[str, Any]] = raw_data['configs']
     cfgs = [Config.from_json(**default, json=cfg) for cfg in configs]
-    if self.args.only and self.args.only > len(cfgs):
-      self.log.warning('Only %s configs available, using all (to use all, omit --only)', len(cfgs))
+
+    f: list[int] = None
+    if self.args.only and any(map(lambda x: x > len(cfgs), self.args.only)): # pylint: disable=bad-builtin
+      self.log.warning('Omitted invalid values for --only : %s', f :=
+                       sorted(list(filter(lambda x: x > len(cfgs), self.args.only))))
+
     # parse the files (slicing with None has no effect on small lists)
-    self.__parse_files(cfgs[:self.args.only])
+    if f:
+      self.args.only -= set(f)
+    self.__parse_files([cfgs[i - 1] for i in self.args.only] if self.args.only else cfgs)
     # create the point cloud geometry
     self.__create_pc_geometry()
     # save the point cloud if needed

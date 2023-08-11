@@ -6,6 +6,45 @@ from ..version import __version__
 __all__ = ['parser']
 
 
+def parseIntSet(nputstr='') -> set[int]:
+  selection: set[int] = set()
+  invalid: set[str] = set()
+  # tokens are comma separated values
+  tokens = [x.strip() for x in nputstr.split(',')]
+  for i in tokens:
+    if len(i) > 0:
+      if i.startswith('<='):
+        i = f'1-{i[2:]}'
+
+    try:
+      # typically tokens are plain old integers
+      selection.add(int(i))
+
+    except: # pylint: disable=bare-except
+
+      # if not, then it might be a range
+      try:
+        token = [int(k.strip()) for k in i.split('-')]
+        if len(token) > 1:
+          token.sort()
+          # we have items seperated by a dash
+          # try to build a valid range
+          first = token[0]
+          last = token[len(token) - 1]
+          for x in range(first, last + 1):
+            selection.add(x)
+
+      except: # pylint: disable=bare-except
+
+        # not an int and not a range...
+        invalid.add(i)
+
+  # report invalid tokens
+  if len(invalid) > 0:
+    raise ValueError('Invalid set: ' + str(invalid))
+  return selection
+
+
 def parser() -> ArgumentParser:
 
   class WeakArgsParser(ArgumentParser):
@@ -32,7 +71,10 @@ def parser() -> ArgumentParser:
         kwargs['default'] = None
       return self.add_non_required_argument(*args, **kwargs)
 
-  return WeakArgsParser(description=f'PCV - point cloud visualizer v{__version__}').add_argument(
+  return WeakArgsParser(
+    description=f'PCV - point cloud visualizer v{__version__}',
+    epilog='visit us on GitHub : https://github.com/ThomasByr/point-cloud-visualizer',
+  ).add_argument(
     '-V',
     '--version',
     action='version',
@@ -66,8 +108,8 @@ def parser() -> ArgumentParser:
     help='do not open open3D - valid when used with --save (since 0.1.3) (default: False)',
   ).add_non_required_argument(
     '--only',
-    type=int,
+    type=parseIntSet,
     metavar='N',
     default=None,
-    help='only parse the first N registered files in the config file (since 0.1.3) (default: parse all)',
+    help='only parse some registered files in the config file (since 0.2.2) (default: parse all)',
   )
