@@ -101,19 +101,21 @@ Finally, run the app by typing the following :
 python pcv.py -vis point_cloud.npy
 ```
 
-| argument (\*)           | hint                                                  | default             |
-| ----------------------- | ----------------------------------------------------- | ------------------- |
-| `-h` or `--help`        | show help message **and exit**                        |                     |
-| `-V` or `--version`     | show program's version number **and exit**            |                     |
-| `-v` or `--verbose`     | increase output verbosity                             |                     |
-| `-i` or `--cbid`        | force color by id (if color components are parsed)    |                     |
-| `-c` or `--cfg` [PATH]  | path to the config file                               | auto detect in tree |
-| `-f` or `--frac` [F]    | fraction of points to render (does not affect saving) | `1.0`               |
-| `-s` or `--save` [PATH] | path to .npy file                                     | do not save scene   |
-| `--no-exe`              | do not execute the app (if `--save`)                  |                     |
-| `--only` [N]            | only parse the first N entries of the config file     | parse all entries   |
+| argument (\*)              | hint                                                  | default             |
+| -------------------------- | ----------------------------------------------------- | ------------------- |
+| `-h` or `--help`           | show help message **and exit**                        |                     |
+| `-V` or `--version`        | show program's version number **and exit**            |                     |
+| `-v` or `--verbose`        | increase output verbosity                             |                     |
+| `-i` or `--cbid`           | force color by id (if color components are parsed)    |                     |
+| `-c` or `--cfg` [PATH]     | path to the config file                               | auto detect in tree |
+| `-f` or `--frac` [F]       | fraction of points to render (does not affect saving) | `1.0`               |
+| `-s` or `--save` [PATH]    | path to .npy file                                     | do not save scene   |
+| `--no-exe`                 | do not execute the app (if `--save`)                  |                     |
+| `--only` [(<=)?N{[,-]N}\*] | only parse some entries of the config file (\*\*)     | parse all entries   |
 
 (\*) _[...] means the argument expects a value if specified ; no arguments are required for the app to run_
+
+(\*\*) _`N` is an integer, `<=N` means "less than or equal to N", eg. `only '<=3,5-7` will parse the first 3 entries and the entries 5, 6 and 7_
 
 ## ⚗️ Testing
 
@@ -186,6 +188,7 @@ Please read the [changelog](changelog.md) file for the full history !
 - added `--cbid` and `--frac` to affect rendering _only_
 - the parser is no longer bloating the main file
 - fixed a bug where points where created with wrong color
+- modified `--only` to accept range (type `--only <=N` for older behavior)
 
 </details>
 
