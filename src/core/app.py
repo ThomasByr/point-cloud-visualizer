@@ -234,7 +234,7 @@ class App:
     with open(self.args.cfg, 'r', encoding='utf-8') as f:
       try:
         raw_data = pyjson5.decode_io(f, 4, some=False) # pylint: disable=no-member
-      except pyjson5.Json5DecoderException as e:
+      except pyjson5.Json5DecoderException as e:       # pylint: disable=no-member
         self.log.critical(
           'Failed to parse json config file : '
           'maximum nesting level could be reached, please check your file\n%s', e)
