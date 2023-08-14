@@ -134,25 +134,6 @@ class Point(np.ndarray):
   def __ne__(self, other):
     return not self == other
 
-  # def __getitem__(self, key: int | slice) -> float | np.ndarray:
-  #   if isinstance(key, slice):
-  #     return np.array([self[i] for i in range(*key.indices(len(self)))])
-  #   return super().__getitem__(key)
-
-  # def __setitem__(self, key: int | slice, value: float | list[float]) -> None:
-  #   if isinstance(key, slice):
-  #     for i, v in zip(range(*key.indices(len(self))), value):
-  #       self[i] = v
-  #   else:
-  #     super().__setitem__(key, value)
-
-  # def __delitem__(self, key: int | slice) -> None:
-  #   if isinstance(key, slice):
-  #     for i in range(*key.indices(len(self))):
-  #       del self[i]
-  #   else:
-  #     super().__delitem__(key)
-
   @classmethod
   def from_factory(cls, string: str, fmt: str) -> 'Point':
     """
