@@ -19,3 +19,4 @@
 - fixed a bug where points where created with wrong color
 - modified `--only` to accept range (type `--only "<=N"` for older behavior)
 - support for json5 config files
+- `--make_parent` option to not fail if the parent directory in `--save` does not exist
