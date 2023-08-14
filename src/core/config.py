@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Tuple, Any
 
 __all__ = ['Config']
 
@@ -7,7 +7,7 @@ __all__ = ['Config']
 @dataclass
 class Config:
   file_path: str
-  source_xyz: tuple[float, float, float] = (0, 0, 0)
+  source_xyz: Tuple[float, float, float] = (0, 0, 0)
   pattern: str = '{?},{x},{y},{z}'
   skip_first_line: bool = True
 
