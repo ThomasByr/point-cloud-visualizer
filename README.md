@@ -7,7 +7,7 @@
 [![GitHub latest commit](https://badgen.net/github/last-commit/ThomasByr/point-cloud-visualizer)](https://gitHub.com/ThomasByr/point-cloud-visualizer/commit/)
 [![Maintenance](https://img.shields.io/badge/maintained%3F-yes-green.svg)](https://GitHub.com/ThomasByr/point-cloud-visualizer/graphs/commit-activity)
 
-[![Python Package Conda&Hatch](https://github.com/ThomasByr/point-cloud-visualizer/actions/workflows/python-package-conda.yml/badge.svg)](https://github.com/ThomasByr/point-cloud-visualizer/actions/workflows/python-package-conda.yml)
+[![Python Package](https://github.com/ThomasByr/point-cloud-visualizer/actions/workflows/python-package.yml/badge.svg)](https://github.com/ThomasByr/point-cloud-visualizer/actions/workflows/python-package.yml)
 [![GitHub version](https://badge.fury.io/gh/ThomasByr%2Fpoint-cloud-visualizer.svg)](https://github.com/ThomasByr/point-cloud-visualizer)
 [![Author](https://img.shields.io/badge/author-@ThomasByr-blue)](https://github.com/ThomasByr)
 
@@ -98,7 +98,7 @@ Finally, run the app by typing the following :
 
 ```bash
 # Run app
-python pcv.py -vis point_cloud.npy
+python pcv.py -vips out/point_cloud.npy
 ```
 
 | argument (\*)              | hint                                                  | default             |
