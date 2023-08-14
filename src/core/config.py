@@ -29,7 +29,7 @@ class Config:
       raise TypeError('skip_first_line must be a bool')
 
   @classmethod
-  def from_json(cls, json: dict[str, Any] = None, **kwargs) -> 'Config':
+  def from_json(cls, json: Dict[str, Any] = None, **kwargs) -> 'Config':
     """
     create a Config from a json object
 

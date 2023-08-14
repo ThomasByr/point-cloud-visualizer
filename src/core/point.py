@@ -1,6 +1,6 @@
 import re
 import random
-from typing import Tuple
+from typing import Dict, Tuple
 from functools import lru_cache
 
 import numpy as np
@@ -12,7 +12,7 @@ class SomewhatRandomColorGenerator:
 
   def __init__(self, seed: int = 42):
     self.__random = random.Random(seed)
-    self.__passed: dict[int, Tuple[float, float, float]] = {}
+    self.__passed: Dict[int, Tuple[float, float, float]] = {}
 
   @lru_cache(maxsize=256)
   def __call__(self, cid: int = None) -> Tuple[float, float, float]:

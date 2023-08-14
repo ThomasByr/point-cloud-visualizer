@@ -5,7 +5,7 @@ import logging
 import random
 from threading import Thread
 
-from typing import Set, List, Union, Any
+from typing import Dict, Set, List, Union, Any
 from datetime import datetime
 
 from argparse import Namespace
@@ -239,8 +239,8 @@ class App:
           'Failed to parse json config file : '
           'maximum nesting level could be reached, please check your file\n%s', e)
         sys.exit(1)
-    default: dict[str, Any] = raw_data['default']
-    configs: List[dict[str, Any]] = raw_data['configs']
+    default: Dict[str, Any] = raw_data['default']
+    configs: List[Dict[str, Any]] = raw_data['configs']
     cfgs = [Config.from_json(json=cfg, **default) for cfg in configs]
 
     fset: List[int] = None
