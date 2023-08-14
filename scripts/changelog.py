@@ -8,6 +8,9 @@ Make the README file <details> section.
 
 """
 
+from __future__ import annotations
+
+
 def get_changes() -> list[str]:
   """
   Gets the changes from the changelog.md file.
