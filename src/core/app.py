@@ -5,7 +5,7 @@ import logging
 import random
 from threading import Thread
 
-from typing import Union, Any
+from typing import Set, List, Union, Any
 from datetime import datetime
 
 from argparse import Namespace
@@ -34,7 +34,7 @@ class Args:
   save: Union[str, None]      # save path
   make_parent: bool           # make parent directory of save path if it does not exist
   no_exe: bool                # no gui
-  only: Union[set[int], None] # only parse this many files
+  only: Union[Set[int], None] # only parse this many files
 
 
 class App:
@@ -68,7 +68,7 @@ class App:
       self.log.info('GUI up and ready 🚀')
 
     self.log.info('Setting up the application...')
-    self.points: list[Point] = [] # list of points (from all files)
+    self.points: List[Point] = [] # list of points (from all files)
 
     signal.signal(signal.SIGINT, self.__on_end) # register the signal handler
     signal.signal(signal.SIGTERM, self.__on_end)
@@ -111,7 +111,7 @@ class App:
   def __get_json_config_path(self) -> str:
     # search for the config.json file or any json file recursively
     auto_filenames = {'config', 'cfg', 'init', 'ini'}
-    found: set[str] = set()
+    found: Set[str] = set()
     for root, dirs, files in os.walk(os.getcwd(), topdown=True):
       dirs[:] = list(filter(lambda d: not d.startswith(('.', '__')), dirs)) # ignore hidden directories
       for file in files:
@@ -144,7 +144,7 @@ class App:
     self.log.warning('Received %s signal ... Exiting', signal.Signals(signum).name)
     sys.exit(0)
 
-  def __parse_files(self, cfgs: list[Config]) -> None:
+  def __parse_files(self, cfgs: List[Config]) -> None:
     """
     initially parse the files and store them in the database
     
@@ -162,8 +162,8 @@ class App:
     delta_seconds = (end_ts - start_ts).total_seconds()
     self.log.info('Parsed %s points in %.3f s', format(len(self.points), '_'), delta_seconds)
 
-  def __load_points(self, cfg: Config) -> list[Point]:
-    points: list[Point] = []                    # list of points
+  def __load_points(self, cfg: Config) -> List[Point]:
+    points: List[Point] = []                    # list of points
     offset = Point(*cfg.source_xyz, *([0] * 4)) # offset location (r,g,b,id to 0 for add method)
     basename = os.path.basename(cfg.file_path)  # basename for logging
     self.log.debug('Loading file: [...]/%s', basename)
@@ -240,10 +240,10 @@ class App:
           'maximum nesting level could be reached, please check your file\n%s', e)
         sys.exit(1)
     default: dict[str, Any] = raw_data['default']
-    configs: list[dict[str, Any]] = raw_data['configs']
+    configs: List[dict[str, Any]] = raw_data['configs']
     cfgs = [Config.from_json(json=cfg, **default) for cfg in configs]
 
-    fset: list[int] = None
+    fset: List[int] = None
     if self.args.only and any(map(lambda x: x > len(cfgs), self.args.only)): # pylint: disable=bad-builtin
       self.log.warning('Omitted invalid values for --only : %s', fset :=
                        sorted(list(filter(lambda x: x > len(cfgs), self.args.only))))

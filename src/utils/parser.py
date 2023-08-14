@@ -1,5 +1,6 @@
 import sys
 from argparse import ArgumentParser
+from typing import Set
 from typing_extensions import override
 
 from ..version import __version__
@@ -7,9 +8,9 @@ from ..version import __version__
 __all__ = ['parser']
 
 
-def parse_int_set(inputstr='') -> set[int]:
-  selection: set[int] = set()
-  invalid: set[str] = set()
+def parse_int_set(inputstr='') -> Set[int]:
+  selection: Set[int] = set()
+  invalid: Set[str] = set()
   # tokens are comma separated values
   tokens = [x.strip() for x in inputstr.split(',')]
   for i in tokens:
