@@ -167,8 +167,7 @@ class Point(np.ndarray):
     b: int = None
     cid: int = None
 
-    match = re.match(fmt, string)
-    if match is None:
+    if (match := re.match(fmt, string)) is None:
       raise RuntimeError('invalid fmt string format : no match')
 
     try:
