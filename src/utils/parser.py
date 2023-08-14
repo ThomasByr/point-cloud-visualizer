@@ -108,7 +108,7 @@ def parser() -> ArgumentParser:
   ).add_true_false_argument(
     '-p',
     '--make-parent',
-    help='make the parent directory of the save path if it does not exist (since 0.2.3) (default: False)',  
+    help='make the parent directory of the save path if it does not exist (since 0.2.3) (default: False)',
   ).add_true_false_argument(
     '--no-exe',
     help='do not open open3D - valid when used with --save (since 0.1.3) (default: False)',
