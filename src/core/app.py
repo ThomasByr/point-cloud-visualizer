@@ -5,7 +5,7 @@ import logging
 import random
 from threading import Thread
 
-from typing import Any
+from typing import Union, Any
 from datetime import datetime
 
 from argparse import Namespace
@@ -27,14 +27,14 @@ __all__ = ['App']
 
 @dataclass
 class Args:
-  verbose: bool         # verbose logging
-  cbid: bool            # force color by id
-  cfg: str | None       # config path
-  frac: float | None    # fraction of points to render
-  save: str | None      # save path
-  make_parent: bool     # make parent directory of save path if it does not exist
-  no_exe: bool          # no gui
-  only: set[int] | None # only parse this many files
+  verbose: bool               # verbose logging
+  cbid: bool                  # force color by id
+  cfg: Union[str, None]       # config path
+  frac: Union[float, None]    # fraction of points to render
+  save: Union[str, None]      # save path
+  make_parent: bool           # make parent directory of save path if it does not exist
+  no_exe: bool                # no gui
+  only: Union[set[int], None] # only parse this many files
 
 
 class App:
@@ -59,10 +59,10 @@ class App:
       self.log.critical('Invalid json config file path supplied (%s)', self.args.cfg)
       sys.exit(1)
 
-    self.vis: visualization.Visualizer | None = None # pylint: disable=no-member
-    self.pc: geometry.PointCloud | None = None       # point cloud geometry
+    self.vis: visualization.Visualizer = None # pylint: disable=no-member
+    self.pc: geometry.PointCloud = None       # point cloud geometry
     if not self.args.no_exe:
-      self.vis = visualization.Visualizer()          # pylint: disable=no-member
+      self.vis = visualization.Visualizer()   # pylint: disable=no-member
       self.pc = geometry.PointCloud()
       self.vis.create_window(window_name='Point Cloud Visualizer', height=600, width=800)
       self.log.info('GUI up and ready 🚀')
