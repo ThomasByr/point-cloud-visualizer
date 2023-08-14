@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Tuple, Any
+from typing import Any
 
 __all__ = ['Config']
 
@@ -7,7 +7,7 @@ __all__ = ['Config']
 @dataclass
 class Config:
   file_path: str
-  source_xyz: Tuple[float, float, float] = (0, 0, 0)
+  source_xyz: tuple[float, float, float] = (0, 0, 0)
   pattern: str = '{?},{x},{y},{z}'
   skip_first_line: bool = True
 
@@ -29,7 +29,7 @@ class Config:
       raise TypeError('skip_first_line must be a bool')
 
   @classmethod
-  def from_json(cls, json: Dict[str, Any] = None, **kwargs) -> 'Config':
+  def from_json(cls, json: dict[str, Any] = None, **kwargs) -> 'Config':
     """
     create a Config from a json object
 

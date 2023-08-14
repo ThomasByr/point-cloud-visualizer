@@ -1,12 +1,11 @@
 import logging
-from typing import List
 from typing_extensions import override
 from termcolor import colored
 
 __all__ = ['UsefulFormatter']
 
 
-def formatter(c: str, attrs: List[str] = None) -> str:
+def formatter(c: str, attrs: list[str] = None) -> str:
   return f"{colored('%(asctime)s', 'grey', attrs=['bold'])} {colored('%(levelname)8s', c, attrs=attrs)} {colored('%(name)s', 'magenta')} (%(filename)s:%(lineno)d) %(message)s"
 
 

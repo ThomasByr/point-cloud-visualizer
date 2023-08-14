@@ -1,6 +1,5 @@
 import re
 import random
-from typing import Dict, Tuple
 from functools import lru_cache
 
 import numpy as np
@@ -12,10 +11,10 @@ class SomewhatRandomColorGenerator:
 
   def __init__(self, seed: int = 42):
     self.__random = random.Random(seed)
-    self.__passed: Dict[int, Tuple[float, float, float]] = {}
+    self.__passed: dict[int, tuple[float, float, float]] = {}
 
   @lru_cache(maxsize=256)
-  def __call__(self, cid: int = None) -> Tuple[float, float, float]:
+  def __call__(self, cid: int = None) -> tuple[float, float, float]:
     cid = cid or -1
     try:
       return self.__passed[cid]
@@ -24,7 +23,7 @@ class SomewhatRandomColorGenerator:
       return self.__passed[cid]
 
 
-def get_maybe_rgb_color(r: int, g: int, b: int) -> Tuple[int, int, int]:
+def get_maybe_rgb_color(r: int, g: int, b: int) -> tuple[int, int, int]:
   if r is not None and g is not None and b is not None:
     return r, g, b
   if r is not None and g is not None:
@@ -200,7 +199,7 @@ class Point(np.ndarray):
 
     return cls(x, y, z, r, g, b, cid)
 
-  def get_color(self, cbid: bool = False) -> Tuple[float, float, float]:
+  def get_color(self, cbid: bool = False) -> tuple[float, float, float]:
     """
     get rbg color values\\
     returns either the color values passed in the constructor or a random color based on the id
