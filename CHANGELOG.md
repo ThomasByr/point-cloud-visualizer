@@ -18,3 +18,4 @@
 - the parser is no longer bloating the main file
 - fixed a bug where points where created with wrong color
 - modified `--only` to accept range (type `--only "<=N"` for older behavior)
+- support for json5 config files
