@@ -41,6 +41,4 @@ if sys.version_info < (3, 10):
 
 if __name__ == '__main__':
   from src import *
-
-  args = parser().parse_args()
-  app = App(args) # create and run app
+  App(parser().parse_args())
