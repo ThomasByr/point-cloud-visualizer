@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple, Any
+from typing import Dict, Tuple, Any
 
 __all__ = ['Config']
 
