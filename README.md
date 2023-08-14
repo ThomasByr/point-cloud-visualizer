@@ -58,7 +58,7 @@ Allowed fields for the `pattern` property are (`x`, `y`, `z` are mandatory) :
 
 (\*) _the id will be used to color the points in rendering if all color components are omitted_
 
-`pattern` and `skip_first_line` fields can be overwritten in the `configs` array if needed. `source_xyz` is the position of the sensor in the scene.
+`pattern` and `skip_first_line` fields can be overwritten in the `configs` array if needed. `source_xyz` is the position of the sensor in the scene and only `file_path` is not set by default
 
 Then obviously, you will need the point clouds files in a text file format (csv, txt, etc.) with the corresponding format :
 
@@ -78,7 +78,7 @@ Then obviously, you will need the point clouds files in a text file format (csv,
 >
 > Please note we do not officially support Windows or MacOS, but we do provide some instructions for those who want to use it on these platforms.
 
-You do not explicitly need a conda environment for the bot to run. But it is always recommended nontheless, especially because the next LTS of Ubuntu won't let users pip-install anything without a virtual environment. At the time of writing, this app requires `python >= 3.10` to run.
+You do not explicitly need a conda environment for the app to run. But it is always recommended nontheless, especially because the next LTS of Ubuntu won't let users pip-install anything without a virtual environment. At the time of writing, this app requires `python >= 3.8` to run. Note that because of open3d, we do not support python 3.11 yet. Furthermore, support has been removed for python 3.6 and 3.7.
 
 ```bash
 # Clone the repository
