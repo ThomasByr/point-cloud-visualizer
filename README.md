@@ -22,9 +22,9 @@
 
 This project is a simple GUI for visualizing point clouds using the [Open3d](http://www.open3d.org/) library. This tool is written in Python.
 
-Just provide a `config.json` file (in a "data" directory for eg.) following the model :
+Just provide a `config.json` file (supported schemes are json, jsonc, json5) following the model :
 
-```json
+```json5
 {
   "default": {
     "pattern": "{?},{x},{y},{z},{r},{g},{b},{id}",
@@ -110,6 +110,7 @@ python pcv.py -vis point_cloud.npy
 | `-c` or `--cfg` [PATH]     | path to the config file                               | auto detect in tree |
 | `-f` or `--frac` [F]       | fraction of points to render (does not affect saving) | `1.0`               |
 | `-s` or `--save` [PATH]    | path to .npy file                                     | do not save scene   |
+| `-p` or `--make-parent`    | create parent directories if needed (for `--save`)    |                     |
 | `--no-exe`                 | do not execute the app (if `--save`)                  |                     |
 | `--only` [(<=)?N{[,-]N}\*] | only parse some entries of the config file (\*\*)     | parse all entries   |
 
@@ -189,6 +190,8 @@ Please read the [changelog](changelog.md) file for the full history !
 - the parser is no longer bloating the main file
 - fixed a bug where points where created with wrong color
 - modified `--only` to accept range (type `--only "<=N"` for older behavior)
+- support for json5 config files
+- `--make_parent` option to not fail if the parent directory in `--save` does not exist
 
 </details>
 
