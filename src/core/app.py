@@ -1,6 +1,5 @@
 import os
 import sys
-import json
 import signal
 import logging
 import random
@@ -15,8 +14,8 @@ from open3d import visualization
 from open3d import geometry
 from open3d import utility
 
+import pyjson5
 import numpy as np
-from numpy.random import Generator, PCG64
 
 from .config import Config
 from .point import *
@@ -28,17 +27,16 @@ __all__ = ['App']
 
 @dataclass
 class Args:
-  verbose: bool      # verbose logging
-  cbid: bool         # force color by id
-  save: str | None   # save path
-  no_exe: bool       # no gui
-  cfg: str | None    # config path
-  frac: float | None # fraction of points to render
-  only: int | None   # only parse this many files
+  verbose: bool         # verbose logging
+  cbid: bool            # force color by id
+  save: str | None      # save path
+  no_exe: bool          # no gui
+  cfg: str | None       # config path
+  frac: float | None    # fraction of points to render
+  only: set[int] | None # only parse this many files
 
 
 class App:
-  device = Generator(PCG64())
 
   def __init__(self, args: Namespace) -> None:
     self.__check_args(args)
@@ -104,14 +102,15 @@ class App:
       raise RuntimeError(f'Invalid value for --frac : {args.frac} (should be > 0 and <= 1)')
 
   def __get_json_config_path(self) -> str:
-    # search for the config.json file or any .json file recursively
+    # search for the config.json file or any json file recursively
+    auto_filenames = {'config', 'cfg', 'init', 'ini'}
     found: set[str] = set()
     for root, dirs, files in os.walk(os.getcwd(), topdown=True):
       dirs[:] = list(filter(lambda d: not d.startswith(('.', '__')), dirs)) # ignore hidden directories
       for file in files:
-        if file.endswith('.json'):
+        if file.endswith(('.json', '.jsonc', '.json5')):                    # if json
           found.add(os.path.join(root, file))
-          if 'config.json' in file:
+          if os.path.splitext(file)[0].lower() in auto_filenames:           # if common name
             return os.path.join(root, file)
 
     if len(found) == 0:
@@ -136,11 +135,6 @@ class App:
     """
     print('\r', end='')
     self.log.warning('Received %s signal ... Exiting', signal.Signals(signum).name)
-
-    try:
-      self.vis.destroy_window()
-    except AttributeError: # --no-exe case
-      pass
     sys.exit(0)
 
   def __parse_files(self, cfgs: list[Config]) -> None:
@@ -163,7 +157,7 @@ class App:
 
   def __load_points(self, cfg: Config) -> list[Point]:
     points: list[Point] = []                    # list of points
-    offset = Point(*cfg.source_xyz, *([0] * 4)) # offset location (r,g,b,id to 0 to __add__)
+    offset = Point(*cfg.source_xyz, *([0] * 4)) # offset location (r,g,b,id to 0 for add method)
     basename = os.path.basename(cfg.file_path)  # basename for logging
     self.log.debug('Loading file: [...]/%s', basename)
     self.log.debug('Offset: %s', offset)
@@ -229,20 +223,27 @@ class App:
     setup the application
     """
     # load the json file and create the configs
+    raw_data = None
     with open(self.args.cfg, 'r', encoding='utf-8') as f:
-      raw_data = json.load(f)
+      try:
+        raw_data = pyjson5.decode_io(f, 4, some=False) # pylint: disable=no-member
+      except pyjson5.Json5DecoderException as e:
+        self.log.critical(
+          'Failed to parse json config file : '
+          'maximum nesting level could be reached, please check your file\n%s', e)
+        sys.exit(1)
     default: dict[str, Any] = raw_data['default']
     configs: list[dict[str, Any]] = raw_data['configs']
-    cfgs = [Config.from_json(**default, json=cfg) for cfg in configs]
+    cfgs = [Config.from_json(json=cfg, **default) for cfg in configs]
 
-    f: list[int] = None
+    fset: list[int] = None
     if self.args.only and any(map(lambda x: x > len(cfgs), self.args.only)): # pylint: disable=bad-builtin
-      self.log.warning('Omitted invalid values for --only : %s', f :=
+      self.log.warning('Omitted invalid values for --only : %s', fset :=
                        sorted(list(filter(lambda x: x > len(cfgs), self.args.only))))
 
     # parse the files (slicing with None has no effect on small lists)
-    if f:
-      self.args.only -= set(f)
+    if fset:
+      self.args.only -= set(fset)
     self.__parse_files([cfgs[i - 1] for i in self.args.only] if self.args.only else cfgs)
     # create the point cloud geometry
     self.__create_pc_geometry()
@@ -259,7 +260,10 @@ class App:
       self.vis.update_geometry(self.pc)
       self.vis.update_renderer()
 
+  def __del__(self) -> None:
+    """ cleanup """
     try:
       self.vis.destroy_window()
+      self.pc.clear()
     except AttributeError: # --no-exe case
       pass
