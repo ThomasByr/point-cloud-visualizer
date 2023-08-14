@@ -98,9 +98,9 @@ class App:
       raise RuntimeError(f'Invalid save path supplied : {args.save} is a directory')
     if args.make_parent and not args.save:
       raise RuntimeError('Passing --make-parent without --save will do nothing')
-    if args.save and not os.path.exists(p := os.path.dirname(args.save)):
+    if args.save and not os.path.exists(os.path.dirname(args.save)):
       if args.make_parent:
-        os.makedirs(p, exist_ok=False)
+        os.makedirs(os.path.dirname(args.save), exist_ok=False)
       else:
         raise RuntimeError(f'Invalid save path supplied : parent directory of {args.save} does not exist')
     if args.no_exe and not args.save:
@@ -245,8 +245,8 @@ class App:
 
     fset: List[int] = None
     if self.args.only and any(map(lambda x: x > len(cfgs), self.args.only)): # pylint: disable=bad-builtin
-      self.log.warning('Omitted invalid values for --only : %s', fset :=
-                       sorted(list(filter(lambda x: x > len(cfgs), self.args.only))))
+      fset = sorted(list(filter(lambda x: x > len(cfgs), self.args.only)))
+      self.log.warning('Omitted invalid values for --only : %s', fset)
 
     # parse the files (slicing with None has no effect on small lists)
     if fset:
