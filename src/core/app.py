@@ -5,7 +5,7 @@ import logging
 import random
 from threading import Thread
 
-from typing import Union, Any
+from typing import Any
 from datetime import datetime
 
 from argparse import Namespace
@@ -27,14 +27,14 @@ __all__ = ['App']
 
 @dataclass
 class Args:
-  verbose: bool               # verbose logging
-  cbid: bool                  # force color by id
-  cfg: Union[str, None]       # config path
-  frac: Union[float, None]    # fraction of points to render
-  save: Union[str, None]      # save path
-  make_parent: bool           # make parent directory of save path if it does not exist
-  no_exe: bool                # no gui
-  only: Union[set[int], None] # only parse this many files
+  verbose: bool         # verbose logging
+  cbid: bool            # force color by id
+  cfg: str | None       # config path
+  frac: float | None    # fraction of points to render
+  save: str | None      # save path
+  make_parent: bool     # make parent directory of save path if it does not exist
+  no_exe: bool          # no gui
+  only: set[int] | None # only parse this many files
 
 
 class App:
