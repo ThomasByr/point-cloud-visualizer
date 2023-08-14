@@ -29,10 +29,11 @@ __all__ = ['App']
 class Args:
   verbose: bool         # verbose logging
   cbid: bool            # force color by id
-  save: str | None      # save path
-  no_exe: bool          # no gui
   cfg: str | None       # config path
   frac: float | None    # fraction of points to render
+  save: str | None      # save path
+  make_parent: bool     # make parent directory of save path if it does not exist
+  no_exe: bool          # no gui
   only: set[int] | None # only parse this many files
 
 
@@ -41,13 +42,14 @@ class App:
   def __init__(self, args: Namespace) -> None:
     self.__check_args(args)
     self.args = Args(
-      args.verbose,
-      args.cbid,
-      args.save,
-      args.no_exe,
-      args.cfg or self.__get_json_config_path(),
-      args.frac,
-      args.only,
+      verbose=args.verbose,
+      cbid=args.cbid,
+      cfg=args.cfg or self.__get_json_config_path(),
+      frac=args.frac,
+      save=args.save,
+      make_parent=args.make_parent,
+      no_exe=args.no_exe,
+      only=args.only,
     )
 
     log_lvl = logging.DEBUG if self.args.verbose else logging.INFO
@@ -88,18 +90,23 @@ class App:
     ```
     arguments passed to the application
     """
-    if args.no_exe and not args.save:
-      raise RuntimeError('Passing --no-exe without --save will do nothing')
-    if args.save and os.path.isdir(args.save):
-      raise RuntimeError(f'Invalid save path supplied : {args.save} is a directory')
-    if args.save and not os.path.exists(os.path.dirname(args.save)):
-      raise RuntimeError(f'Invalid save path supplied : parent directory of {args.save} does not exist')
-    if args.only and any(map(lambda x: x <= 0, args.only)): # pylint: disable=bad-builtin
-      raise RuntimeError(f'Invalid value for --only : {args.only} (should be > 0)')
     if args.frac and args.no_exe:
       raise RuntimeError('Passing --frac with --no-exe will have no effect')
     if args.frac and (args.frac <= 0 or args.frac > 1):
       raise RuntimeError(f'Invalid value for --frac : {args.frac} (should be > 0 and <= 1)')
+    if args.save and os.path.isdir(args.save):
+      raise RuntimeError(f'Invalid save path supplied : {args.save} is a directory')
+    if args.make_parent and not args.save:
+      raise RuntimeError('Passing --make-parent without --save will do nothing')
+    if args.save and not os.path.exists(p := os.path.dirname(args.save)):
+      if args.make_parent:
+        os.makedirs(p, exist_ok=False)
+      else:
+        raise RuntimeError(f'Invalid save path supplied : parent directory of {args.save} does not exist')
+    if args.no_exe and not args.save:
+      raise RuntimeError('Passing --no-exe without --save will do nothing')
+    if args.only and any(map(lambda x: x <= 0, args.only)): # pylint: disable=bad-builtin
+      raise RuntimeError(f'Invalid value for --only : {args.only} (should be > 0)')
 
   def __get_json_config_path(self) -> str:
     # search for the config.json file or any json file recursively
