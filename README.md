@@ -195,7 +195,7 @@ Please read the [changelog](changelog.md) file for the full history !
 
 **v0.3** wide python support
 
-- support for python 3.8 to 3.10
+- support for python 3.8 to 3.10 (removed 3.6 and 3.7)
 
 </details>
 
