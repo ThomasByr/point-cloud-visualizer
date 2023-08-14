@@ -61,10 +61,10 @@ class App:
       self.log.critical('Invalid json config file path supplied (%s)', self.args.cfg)
       sys.exit(1)
 
-    self.vis: visualization.Visualizer = None # pylint: disable=no-member
-    self.pc: geometry.PointCloud = None       # point cloud geometry
+    self.vis: visualization.Visualizer = None
+    self.pc: geometry.PointCloud = None     # point cloud geometry
     if not self.args.no_exe:
-      self.vis = visualization.Visualizer()   # pylint: disable=no-member
+      self.vis = visualization.Visualizer() # pylint: disable=no-member
       self.pc = geometry.PointCloud()
       self.vis.create_window(window_name='Point Cloud Visualizer', height=600, width=800)
       self.log.info('GUI up and ready 🚀')
