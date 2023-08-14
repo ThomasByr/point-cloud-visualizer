@@ -193,6 +193,10 @@ Please read the [changelog](changelog.md) file for the full history !
 - support for json5 config files
 - `--make_parent` option to not fail if the parent directory in `--save` does not exist
 
+**v0.3** wide python support
+
+- support for python 3.6 to 3.10
+
 </details>
 
 ## 🐛 Bugs and TODO
