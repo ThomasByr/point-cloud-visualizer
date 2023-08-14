@@ -7,5 +7,5 @@ python-dotenv     >= 0.20.0, < 1.1  # load environment variables from a .env fil
 
 typing_extensions >= 4.1.0, < 4.7   # mainly for `override` decorator
 open3d            >= 0.15, < 0.18   # for point cloud processing
-numpy             >= 1.21.0, < 1.26 # for arrays and stuff
+numpy             >= 1.19.0, < 1.26 # for arrays and stuff
 pyjson5           == 1.6.*          # for parsing json5 files
