@@ -23,4 +23,4 @@
 
 **v0.3** wide python support
 
-- support for python 3.6 to 3.10
+- support for python 3.8 to 3.10
