@@ -8,10 +8,7 @@ Make the README file <details> section.
 
 """
 
-from typing import List
-
-
-def get_changes() -> List[str]:
+def get_changes() -> list[str]:
   """
   Gets the changes from the changelog.md file.
 
@@ -21,7 +18,7 @@ def get_changes() -> List[str]:
   with open('CHANGELOG.md', 'r', encoding='utf-8') as f:
     changelog = f.readlines()
   changelog = [e.strip() for e in changelog]
-  chg: List[str] = []
+  chg: list[str] = []
   for e in reversed(changelog):
     chg.append(e)
     if len(e) > 0 and e[0] == '#':
@@ -29,7 +26,7 @@ def get_changes() -> List[str]:
   return list(reversed(chg))
 
 
-def update(chg: List[str]) -> None:
+def update(chg: list[str]) -> None:
   """
   Updates README.md with changelog
 
@@ -63,7 +60,7 @@ def update(chg: List[str]) -> None:
   index_of = head.find('#')
   head = head[index_of::].strip('##')
 
-  details: List[str] = []
+  details: list[str] = []
   details.append(f'  <summary> {head} (click here to expand) </summary>')
   details.append('\n')
   for e in chg[1:]:
