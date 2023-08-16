@@ -5,7 +5,7 @@ import sys
 import signal
 import logging
 import random
-from threading import Thread
+from multiprocessing import Process
 
 from typing import Any
 from datetime import datetime
@@ -227,7 +227,7 @@ class App:
 
     if self.args.save:
       # launch the save function in a separate thread
-      Thread(target=__save_npy, args=(self.args.save,)).start()
+      Process(target=__save_npy, args=(self.args.save,)).start()
 
   def __setup(self) -> None:
     """
@@ -265,11 +265,8 @@ class App:
     """
     run the gui
     """
-    running = not self.args.no_exe
-    while running:
-      running = self.vis.poll_events()
-      self.vis.update_geometry(self.pc)
-      self.vis.update_renderer()
+    if not self.args.no_exe:
+      self.vis.run()
 
   def __del__(self) -> None:
     """ cleanup """
