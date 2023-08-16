@@ -92,6 +92,8 @@ class App:
     ```
     arguments passed to the application
     """
+    if args.cbid and args.no_exe:
+      raise RuntimeError('Passing --cbid with --no-exe will have no effect')
     if args.frac and args.no_exe:
       raise RuntimeError('Passing --frac with --no-exe will have no effect')
     if args.frac and (args.frac <= 0 or args.frac > 1):
