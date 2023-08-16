@@ -169,12 +169,19 @@ You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 ```
 
+This project also includes the following notable packages and libraries:
+
+- [Open3d](http://www.open3d.org/) (MIT License)
+- [Numpy](https://numpy.org/) (BSD-3-Clause License)
+- [CustomTKinter](https://github.com/TomSchimansky/CustomTkinter) (MIT License)
+- [PyJson5](https://github.com/Kijewski/pyjson5) (Apache License 2.0)
+
 ## 🔄 Changelog
 
 Please read the [changelog](changelog.md) file for the full history !
 
 <details>
-  <summary>  Title for major version (click here to expand) </summary>
+  <summary>  v0 - test release (click here to expand) </summary>
 
 **v0.1** first working version
 
