@@ -36,8 +36,8 @@
 
 import sys
 
-if sys.version_info < (3, 10):
-  raise RuntimeError('This program requires Python 3.10 or later.')
+if sys.version_info < (3, 8):
+  raise RuntimeError('This program requires Python 3.8 or later.')
 
 if __name__ == '__main__':
   from src import *
