@@ -204,6 +204,7 @@ Please read the [changelog](changelog.md) file for the full history !
 
 - support for python 3.8 to 3.10 (removed 3.6 and 3.7)
 - fixed artifacts from previous support
+- passive wait for the window to close (see [known bugs](README.md#-bugs-and-todo))
 
 </details>
 
@@ -216,3 +217,7 @@ Please read the [changelog](changelog.md) file for the full history !
 - [ ] `{X}`, `{Y}` and `{Z}` fields in pattern for the position of the sensor
 
 **Known Bugs** (latest fix)
+
+- main thread is blocked while the gui is running
+  - only manual closing of the window is possible
+  - signal handling is not working
