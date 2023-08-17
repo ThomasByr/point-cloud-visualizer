@@ -101,6 +101,7 @@ Finally, run the app by typing the following :
 python pcv.py -vips out/point_cloud.npy
 ```
 
+<!-- markdownlint-disable MD051 -->
 | argument (\*)                      | hint                                               | default             |
 | ---------------------------------- | -------------------------------------------------- | ------------------- |
 | `-h` or `--help`                   | show help message **and exit**                     |                     |
@@ -117,6 +118,7 @@ python pcv.py -vips out/point_cloud.npy
 | `--only` [(<=)?N{[,-]N}\*]         | only parse some entries of the config file (\*\*)  | parse all entries   |
 
 [1]: ## "frac and voxel-size are mutually exclusive"
+<!-- markdownlint-enable MD051 -->
 
 (\*) _[...] means the argument expects a value if specified ; no arguments are required for the app to run_
 
