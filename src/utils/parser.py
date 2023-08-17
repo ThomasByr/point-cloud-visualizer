@@ -101,8 +101,19 @@ def parser() -> ArgumentParser:
     type=float,
     metavar='F',
     default=None,
-    help=
-    'fraction of the point cloud to be displayed - only affects rendering (since 0.2.1) (default: all points)',
+    help='random fraction of the point cloud for downsampling - (since 0.2.1) (default: all points)',
+  ).add_non_required_argument(
+    '-r',
+    '--voxel-size',
+    type=float,
+    metavar='S',
+    default=None,
+    help='voxel size for downsampling (since 0.3.1) (default: no downsampling)',
+  ).add_true_false_argument(
+    '-d',
+    '--downsample',
+    help='downsample the saved point cloud - if both one of frac or voxel-size is parsed given, '
+    'otherwise if frac or voxel-size is given, it will only affect the rendering (since 0.3.1) (default: False)',
   ).add_path_argument(
     '-s',
     '--save',

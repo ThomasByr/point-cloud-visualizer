@@ -33,6 +33,8 @@ class Args:
   cbid: bool            # force color by id
   cfg: str | None       # config path
   frac: float | None    # fraction of points to render
+  voxel_size: float     # voxel size for downsampling
+  downsample: bool      # downsample based on either voxel size or fraction
   save: str | None      # save path
   make_parent: bool     # make parent directory of save path if it does not exist
   no_exe: bool          # no gui
@@ -48,6 +50,8 @@ class App:
       cbid=args.cbid,
       cfg=args.cfg or self.__get_json_config_path(),
       frac=args.frac,
+      voxel_size=args.voxel_size,
+      downsample=args.downsample,
       save=args.save,
       make_parent=args.make_parent,
       no_exe=args.no_exe,
@@ -62,10 +66,10 @@ class App:
       sys.exit(1)
 
     self.vis: visualization.Visualizer = None
-    self.pc: geometry.PointCloud = None     # point cloud geometry
+    self.pc: geometry.PointCloud = geometry.PointCloud()  # point cloud geometry
+    self.spc: geometry.PointCloud = geometry.PointCloud() # saved point cloud geometry
     if not self.args.no_exe:
-      self.vis = visualization.Visualizer() # pylint: disable=no-member
-      self.pc = geometry.PointCloud()
+      self.vis = visualization.Visualizer()               # pylint: disable=no-member
       self.vis.create_window(window_name='Point Cloud Visualizer', height=600, width=800)
       self.log.info('GUI up and ready 🚀')
 
@@ -94,10 +98,18 @@ class App:
     """
     if args.cbid and args.no_exe:
       raise RuntimeError('Passing --cbid with --no-exe will have no effect')
-    if args.frac and args.no_exe:
-      raise RuntimeError('Passing --frac with --no-exe will have no effect')
+    if args.frac and args.no_exe and not args.downsample:
+      raise RuntimeError('Passing --frac with --no-exe but without --downsample will have no effect')
     if args.frac and (args.frac <= 0 or args.frac > 1):
       raise RuntimeError(f'Invalid value for --frac : {args.frac} (should be > 0 and <= 1)')
+    if args.voxel_size and args.no_exe and not args.downsample:
+      raise RuntimeError('Passing --voxel-size with --no-exe but without --downsample will have no effect')
+    if args.voxel_size and args.voxel_size <= 0:
+      raise RuntimeError(f'Invalid value for --voxel-size : {args.voxel_size} (should be > 0)')
+    if args.downsample and not args.frac and not args.voxel_size:
+      raise RuntimeError('Passing --downsample without --frac or --voxel-size will have no effect')
+    if args.frac and args.voxel_size:
+      raise RuntimeError('--frac and --voxel-size are mutually exclusive')
     if args.save and os.path.isdir(args.save):
       raise RuntimeError(f'Invalid save path supplied : {args.save} is a directory')
     if args.make_parent and not args.save:
@@ -109,8 +121,8 @@ class App:
         raise RuntimeError(f'Invalid save path supplied : parent directory of {args.save} does not exist')
     if args.no_exe and not args.save:
       raise RuntimeError('Passing --no-exe without --save will do nothing')
-    if args.only and any(map(lambda x: x <= 0, args.only)): # pylint: disable=bad-builtin
-      raise RuntimeError(f'Invalid value for --only : {args.only} (should be > 0)')
+    if args.only and len(f := sorted(filter(lambda x: x <= 0, args.only))) > 0:
+      raise RuntimeError(f'Invalid value for --only : {f} (should be > 0)')
 
   def __get_json_config_path(self) -> str:
     # search for the config.json file or any json file recursively
@@ -129,7 +141,7 @@ class App:
       sys.exit(1)
     return found.pop()
 
-  def __on_end(self, signum: int, frame: Any) -> None: # pylint: disable=unused-argument
+  def __on_end(self, sig: int, _: Any, /) -> None:
     """
     signal handler for the SIGINT signal
 
@@ -145,7 +157,7 @@ class App:
     current stack frame
     """
     print('\r', end='')
-    self.log.warning('Received %s signal ... Exiting', signal.Signals(signum).name)
+    self.log.warning('Received %s signal ... Exiting', signal.Signals(sig).name)
     sys.exit(0)
 
   def __parse_files(self, cfgs: list[Config]) -> None:
@@ -175,14 +187,19 @@ class App:
     try:
       with open(cfg.file_path, 'r', encoding='utf-8') as f:
 
-        factory = PointFactory(cfg.pattern)     # just so that the fmt is not being parsed at every line
-        start = 1 if cfg.skip_first_line else 0 # skip the first line if needed (should be the same at casting bool to int)
+        factory = PointFactory(cfg.pattern) # just so that the fmt is not being parsed at every line
+        start = True                        # skip the first line if needed (should be the same at casting bool to int)
+        index = np.uint32(0)                # index of the current line (for logging)
 
-        for line in f.readlines()[start:]:
+        for line in f:
+          index += 1
+          if start == cfg.skip_first_line:
+            start = False
+            continue
           try:
             points.append(factory(line) + offset)
           except Exception as e: # pylint: disable=broad-except
-            self.log.critical('Failed to parse line: %s\n%s', line, e)
+            self.log.critical('Failed to parse line: %s (%s:%d)\n%s', line, cfg.file_path, index, e)
             sys.exit(1)
 
     except FileNotFoundError as e:
@@ -195,34 +212,45 @@ class App:
     return points
 
   def __create_pc_geometry(self) -> None:
-    if self.args.no_exe:
-      return
-
     points = self.points
-    if self.args.frac:
+    a = '' if self.args.downsample else 'for rendering '
 
-      _start_ts = datetime.now()
+    if self.args.frac:
+      __start_ts = datetime.now()
       size = int(len(points) * self.args.frac)
       points = random.sample(points, size)
-      _end_ts = datetime.now()
-      _delta_seconds = (_end_ts - _start_ts).total_seconds()
-      self.log.info('Pulled %s points randomly for rendering in %.3f s', format(len(points), '_'),
-                    _delta_seconds)
+      __delta_seconds = (datetime.now() - __start_ts).total_seconds()
+      self.log.info('Pulled %s points randomly %sin %.3f s', format(len(points), '_'), a, __delta_seconds)
 
     start_ts = datetime.now()
     self.pc.points = utility.Vector3dVector(map(lambda p: p.get_xyz(), points))                 # pylint: disable=bad-builtin
     self.pc.colors = utility.Vector3dVector(map(lambda p: p.get_color(self.args.cbid), points)) # pylint: disable=bad-builtin
-    self.vis.add_geometry(self.pc)
     end_ts = datetime.now()
-
     delta_seconds = (end_ts - start_ts).total_seconds()
     self.log.info('Created point cloud geometry in %.3f s', delta_seconds)
+
+    if self.args.voxel_size:
+      __start_ts = datetime.now()
+      self.pc = self.pc.voxel_down_sample(self.args.voxel_size)
+      __delta_seconds = (datetime.now() - __start_ts).total_seconds()
+      self.log.info('Downsampled point cloud geometry %sin %.3f s', a, __delta_seconds)
+
+    if not self.args.no_exe:
+      self.vis.add_geometry(self.pc)
 
   def __save_pc(self) -> None:
 
     def __save_npy(filepath: str):
       # save point data but not object data
-      np.save(filepath, np.array(self.points, dtype=float), allow_pickle=False)
+      spc = geometry.PointCloud()
+      if self.args.save and not self.args.downsample:
+        spc.points = utility.Vector3dVector(map(lambda p: p.get_xyz(), self.points))                 # pylint: disable=bad-builtin
+        spc.colors = utility.Vector3dVector(map(lambda p: p.get_color(self.args.cbid), self.points)) # pylint: disable=bad-builtin
+      elif self.args.save and self.args.downsample:
+        spc = self.pc
+      points = np.asarray(spc.points)
+      colors = np.asarray(spc.colors)
+      np.save(filepath, np.concatenate((points, colors), axis=1), allow_pickle=False)
       self.log.info('Saved point cloud to %s', filepath)
 
     if self.args.save:
@@ -271,7 +299,7 @@ class App:
   def __del__(self) -> None:
     """ cleanup """
     try:
-      self.vis.destroy_window()
       self.pc.clear()
+      self.vis.destroy_window()
     except AttributeError: # --no-exe case
       pass
