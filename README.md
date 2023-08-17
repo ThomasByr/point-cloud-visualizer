@@ -8,7 +8,7 @@
 [![Maintenance](https://img.shields.io/badge/maintained%3F-yes-green.svg)](https://GitHub.com/ThomasByr/point-cloud-visualizer/graphs/commit-activity)
 
 [![Python Package](https://github.com/ThomasByr/point-cloud-visualizer/actions/workflows/python-package.yml/badge.svg)](https://github.com/ThomasByr/point-cloud-visualizer/actions/workflows/python-package.yml)
-[![GitHub version](https://badge.fury.io/gh/ThomasByr%2Fpoint-cloud-visualizer.svg)](https://github.com/ThomasByr/point-cloud-visualizer)
+[![GitHub release](https://img.shields.io/github/release/ThomasByr/point-cloud-visualizer)](https://github.com/ThomasByr/point-cloud-visualizer)
 [![Author](https://img.shields.io/badge/author-@ThomasByr-blue)](https://github.com/ThomasByr)
 
 1. [✏️ In short](#️-in-short)
@@ -101,20 +101,24 @@ Finally, run the app by typing the following :
 python pcv.py -vips out/point_cloud.npy
 ```
 
-| argument (\*)              | hint                                                  | default             |
-| -------------------------- | ----------------------------------------------------- | ------------------- |
-| `-h` or `--help`           | show help message **and exit**                        |                     |
-| `-V` or `--version`        | show program's version number **and exit**            |                     |
-| `-v` or `--verbose`        | increase output verbosity                             |                     |
-| `-i` or `--cbid`           | force color by id (if color components are parsed)    |                     |
-| `-c` or `--cfg` [PATH]     | path to the config file                               | auto detect in tree |
-| `-f` or `--frac` [F]       | fraction of points to render (does not affect saving) | `1.0`               |
-| `-s` or `--save` [PATH]    | path to .npy file                                     | do not save scene   |
-| `-p` or `--make-parent`    | create parent directories if needed (for `--save`)    |                     |
-| `--no-exe`                 | do not execute the app (if `--save`)                  |                     |
-| `--only` [(<=)?N{[,-]N}\*] | only parse some entries of the config file (\*\*)     | parse all entries   |
+| argument (\*)                   | hint                                               | default             |
+| ------------------------------- | -------------------------------------------------- | ------------------- |
+| `-h` or `--help`                | show help message **and exit**                     |                     |
+| `-V` or `--version`             | show program's version number **and exit**         |                     |
+| `-v` or `--verbose`             | increase output verbosity                          |                     |
+| `-i` or `--cbid`                | force color by id (if color components are parsed) |                     |
+| `-c` or `--cfg` PATH            | path to the config file                            | auto detect in tree |
+| `-f` or `--frac` F[\*][1]       | fraction of points for downsampling                |                     |
+| `-r` or `--voxel-size` S[\*][1] | voxel size for downsampling                        |                     |
+| `-d` or `--downsample`          | feed back downsample to the saved point cloud      | render only         |
+| `-s` or `--save` PATH           | path to .npy file                                  | do not save scene   |
+| `-p` or `--make-parent`         | create parent directories if needed (for `--save`) |                     |
+| `--no-exe`                      | do not execute the app (if `--save`)               |                     |
+| `--only` [(<=)?N{[,-]N}\*]      | only parse some entries of the config file (\*\*)  | parse all entries   |
 
-(\*) _[...] means the argument expects a value if specified ; no arguments are required for the app to run_
+[1]: ## 'frac' and 'voxel-size' are mutually exclusive
+
+(\*) _... means the argument expects a value if specified ; no arguments are required for the app to run_
 
 (\*\*) _`N` is an integer, `<=N` means "less than or equal to N", eg. `only '<=3,5-7` will parse the first 3 entries and the entries 5, 6 and 7_
 
@@ -205,6 +209,8 @@ Please read the [changelog](changelog.md) file for the full history !
 - support for python 3.8 to 3.10 (removed 3.6 and 3.7)
 - fixed artifacts from previous support
 - passive wait for the window to close (see [known bugs](README.md#-bugs-and-todo))
+- added `--voxel-size` as an alternative to `--frac`
+- `--downsample` option to feed back the downsampling onto the saved file (previously, downsampling was only applied to the rendering)
 
 </details>
 
