@@ -26,3 +26,5 @@
 - support for python 3.8 to 3.10 (removed 3.6 and 3.7)
 - fixed artifacts from previous support
 - passive wait for the window to close (see [known bugs](README.md#-bugs-and-todo))
+- added `--voxel-size` as an alternative to `--frac`
+- `--downsample` option to feed back the downsampling onto the saved file (previously, downsampling was only applied to the rendering)
