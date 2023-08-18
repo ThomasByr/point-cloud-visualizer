@@ -28,3 +28,4 @@
 - passive wait for the window to close (see [known bugs](README.md#-bugs-and-todo))
 - added `--voxel-size` as an alternative to `--frac`
 - `--downsample` option to feed back the downsampling onto the saved file (previously, downsampling was only applied to the rendering)
+- delayed import of open3d to speed up the cli
