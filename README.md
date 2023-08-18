@@ -20,7 +20,7 @@
 
 ## ✏️ In short
 
-This project is a simple GUI for visualizing point clouds using the [Open3d](http://www.open3d.org/) library. This tool is written in Python.
+This project is a simple GUI for visualizing raw-text point-clouds using the [Open3d](http://www.open3d.org/) library. It is meant to be used with a config file to load multiple point clouds at once. It also supports downsampling and saving the point cloud in a numpy array format.
 
 Just provide a `config.json` file (supported schemes are json, jsonc, json5) following the model :
 
@@ -42,7 +42,6 @@ Just provide a `config.json` file (supported schemes are json, jsonc, json5) fol
     ...
   ]
 }
-
 ```
 
 Allowed fields for the `pattern` property are (`x`, `y`, `z` are mandatory) :
@@ -102,22 +101,24 @@ python pcv.py -vips out/point_cloud.npy
 ```
 
 <!-- markdownlint-disable MD051 -->
-| argument (\*)                      | hint                                               | default             |
-| ---------------------------------- | -------------------------------------------------- | ------------------- |
-| `-h` or `--help`                   | show help message **and exit**                     |                     |
-| `-V` or `--version`                | show program's version number **and exit**         |                     |
-| `-v` or `--verbose`                | increase output verbosity                          |                     |
-| `-i` or `--cbid`                   | force color by id (if color components are parsed) |                     |
-| `-c` or `--cfg` [PATH]             | path to the config file                            | auto detect in tree |
-| `-f` or `--frac` [F] [\*][1]       | fraction of points for downsampling                |                     |
-| `-r` or `--voxel-size` [S] [\*][1] | voxel size for downsampling                        |                     |
-| `-d` or `--downsample`             | feed back downsample to the saved point cloud      | render only         |
-| `-s` or `--save` [PATH]            | path to .npy file                                  | do not save scene   |
-| `-p` or `--make-parent`            | create parent directories if needed (for `--save`) |                     |
-| `--no-exe`                         | do not execute the app (if `--save`)               |                     |
-| `--only` [(<=)?N{[,-]N}\*]         | only parse some entries of the config file (\*\*)  | parse all entries   |
+
+| argument (\*)                              | hint                                               | default             |
+| ------------------------------------------ | -------------------------------------------------- | ------------------- |
+| `-h` or `--help`                           | show help message **and exit**                     |                     |
+| `-V` or `--version`                        | show program's version number **and exit**         |                     |
+| `-v` or `--verbose`                        | increase output verbosity                          |                     |
+| `-i` or `--cbid`                           | force color by id (if color components are parsed) |                     |
+| `-c` or `--cfg` [PATH]                     | path to the config file                            | auto detect in tree |
+| `-f` or `--frac` [F] [\*][1]               | fraction of points for downsampling                |                     |
+| `-r` or `--voxel-size` [S] [\*][1]         | voxel size for downsampling                        |                     |
+| `-d` or `--downsample`                     | feed back downsample to the saved point cloud      | render only         |
+| `-s` or `--save` [PATH]                    | path to .npy file                                  | do not save scene   |
+| `-p` or `--make-parent`                    | create parent directories if needed (for `--save`) |                     |
+| `--no-exe`                                 | do not execute the app (if `--save`)               |                     |
+| `--only` [(<=N)\|(N(-N)?)(,\\s\*N(-N)?)\*] | only parse some entries of the config file (\*\*)  | parse all entries   |
 
 [1]: ## "frac and voxel-size are mutually exclusive"
+
 <!-- markdownlint-enable MD051 -->
 
 (\*) _[...] means the argument expects a value if specified ; no arguments are required for the app to run_
@@ -179,7 +180,6 @@ This project also includes the following notable packages and libraries:
 
 - [Open3d](http://www.open3d.org/) (MIT License)
 - [Numpy](https://numpy.org/) (BSD-3-Clause License)
-- [CustomTKinter](https://github.com/TomSchimansky/CustomTkinter) (MIT License)
 - [PyJson5](https://github.com/Kijewski/pyjson5) (Apache License 2.0)
 
 ## 🔄 Changelog
@@ -213,6 +213,7 @@ Please read the [changelog](changelog.md) file for the full history !
 - passive wait for the window to close (see [known bugs](README.md#-bugs-and-todo))
 - added `--voxel-size` as an alternative to `--frac`
 - `--downsample` option to feed back the downsampling onto the saved file (previously, downsampling was only applied to the rendering)
+- delayed import of open3d to speed up the cli
 
 </details>
 
