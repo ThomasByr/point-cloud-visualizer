@@ -130,6 +130,6 @@ def parser() -> ArgumentParser:
     type=parse_int_set,
     metavar='N',
     default=None,
-    help='only parse some registered files in the config file from \'(<=)?N{[,-]N}*\' '
+    help='only parse some registered files in the config file from \'(<=N)\|(N(-N)?)(,\\s*N(-N)?)*\' '
     '(since 0.2.2) (default: parse all)',
   )
