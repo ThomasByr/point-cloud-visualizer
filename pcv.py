@@ -39,6 +39,9 @@ import sys
 if sys.version_info < (3, 8):
   raise RuntimeError('This program requires Python 3.8 or later.')
 
+# pylint: disable=wrong-import-position
 if __name__ == '__main__':
-  from src import *
-  App(parser().parse_args())
+  from src.utils import parser
+  n = parser().parse_args() # parse arguments before importing App
+  from src.core import App  # also imports open3d and numpy which are slow
+  App(n)                    # instantiate and run App (check args here)
