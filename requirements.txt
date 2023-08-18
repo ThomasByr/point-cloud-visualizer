@@ -5,7 +5,7 @@
 termcolor         == 2.3.*        # for colored output (used in the logger)
 python-dotenv     == 1.0.*        # load environment variables from a .env file (or exported in the shell)
 
-typing_extensions == 4.6.*        # mainly for `override` decorator
+typing_extensions == 4.7.*        # mainly for `override` decorator
 open3d            == 0.17.*       # for point cloud processing
 numpy             >= 1.24, < 1.26 # for arrays and stuff
 pyjson5           == 1.6.*        # for parsing json5 files
