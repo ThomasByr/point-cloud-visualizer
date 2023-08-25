@@ -18,6 +18,8 @@ def parse_int_set(inputstr='') -> set[int]:
     if len(i) > 0:
       if i.startswith('<='):
         i = f'1-{i[2:]}'
+      elif i.startswith('<'):
+        i = f'1-{int(i[1:]) - 1}'
 
     try:
       # typically tokens are plain old integers
@@ -130,6 +132,6 @@ def parser() -> ArgumentParser:
     type=parse_int_set,
     metavar='N',
     default=None,
-    help='only parse some registered files in the config file from \'(<=N)|(N(-N)?)(,\\s*N(-N)?)*\' '
-    '(since 0.2.2) (default: parse all)',
+    help='only parse some registered files in the config file from \'(<=?N)|(N(-N)?)(,\\s*N(-N)?)*\', '
+    'both \'-\' endpoints included (since 0.2.2) (default: parse all)',
   )
