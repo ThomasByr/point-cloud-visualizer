@@ -160,13 +160,16 @@ class Point(np.ndarray):
 
   @classmethod
   def __on_end_from(cls, string: str, fmt: str) -> 'Point':
-    x: float = None # required
-    y: float = None # required
-    z: float = None # required
+    x: float = None  # required
+    y: float = None  # required
+    z: float = None  # required
     r: int = None
     g: int = None
     b: int = None
     cid: int = None
+    sx: float = None # if one is specified, all must be
+    sy: float = None
+    sz: float = None
 
     if (match := re.match(fmt, string)) is None:
       raise RuntimeError('invalid fmt string format : no match')
@@ -196,8 +199,22 @@ class Point(np.ndarray):
     except IndexError:
       pass
 
+    try:
+      sx = float(match.group('X'))
+      sy = float(match.group('Y'))
+      sz = float(match.group('Z'))
+    except IndexError:
+      pass
+
     if x is None or y is None or z is None:
       raise ValueError(f'invalid string format from line \'{string}\' : x, y, z required')
+    # if one of the source coordinates is specified, all must be
+    if any((sx, sy, sz)):
+      if not all((sx, sy, sz)):
+        raise ValueError(f'invalid string format from line \'{string}\' : X, Y, Z required')
+      x += sx
+      y += sy
+      z += sz
 
     return cls(x, y, z, r, g, b, cid)
 
@@ -251,6 +268,9 @@ class PointFactory:
     - `{g}`: green value (int between 0 and 255)
     - `{b}`: blue value (int between 0 and 255)
     - `{id}`: unique identifier (int)
+    - `{X}`: the x coordinate of the source point (float)
+    - `{Y}`: the y coordinate of the source point (float)
+    - `{Z}`: the z coordinate of the source point (float)
     - `{?}`: any field that would be ignored
     """
     self.__fmt = fmt
@@ -266,6 +286,10 @@ class PointFactory:
     self.__fmt = self.__fmt.replace('{b}', r'(?P<b>[0-9]+)')
 
     self.__fmt = self.__fmt.replace('{id}', r'(?P<id>[-+]?[0-9]+)')
+
+    self.__fmt = self.__fmt.replace('{X}', r'(?P<X>[-+]?[0-9]*\.?[0-9]+)')
+    self.__fmt = self.__fmt.replace('{Y}', r'(?P<Y>[-+]?[0-9]*\.?[0-9]+)')
+    self.__fmt = self.__fmt.replace('{Z}', r'(?P<Z>[-+]?[0-9]*\.?[0-9]+)')
 
     i = self.__fmt.count('{?}')
     while i > 0:

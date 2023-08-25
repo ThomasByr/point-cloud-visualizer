@@ -29,16 +29,16 @@ __all__ = ['App']
 
 @dataclass
 class Args:
-  verbose: bool         # verbose logging
-  cbid: bool            # force color by id
-  cfg: str | None       # config path
-  frac: float | None    # fraction of points to render
-  voxel_size: float     # voxel size for downsampling
-  downsample: bool      # downsample based on either voxel size or fraction
-  save: str | None      # save path
-  make_parent: bool     # make parent directory of save path if it does not exist
-  no_exe: bool          # no gui
-  only: set[int] | None # only parse this many files
+  verbose: bool            # verbose logging
+  cbid: bool               # force color by id
+  cfg: str | None          # config path
+  frac: float | None       # fraction of points to render
+  voxel_size: float | None # voxel size for downsampling
+  downsample: bool         # downsample based on either voxel size or fraction
+  save: str | None         # save path
+  make_parent: bool        # make parent directory of save path if it does not exist
+  no_exe: bool             # no gui
+  only: set[int] | None    # only parse this many files
 
 
 class App:
@@ -182,7 +182,7 @@ class App:
     points: list[Point] = []                    # list of points
     offset = Point(*cfg.source_xyz, *([0] * 4)) # offset location (r,g,b,id to 0 for add method)
     basename = os.path.basename(cfg.file_path)  # basename for logging
-    self.log.debug('Loading file: [...]/%s', basename)
+    self.log.debug('Loading file: \u2026/%s', basename)
     self.log.debug('Offset: %s', offset)
     try:
       with open(cfg.file_path, 'r', encoding='utf-8') as f:
@@ -208,7 +208,7 @@ class App:
     except Exception as e: # pylint: disable=broad-except
       self.log.critical('Failed to read file: %s\n%s', cfg.file_path, e)
       sys.exit(1)
-    self.log.debug('Loaded %s points from file: [...]/%s', format(len(points), '_'), basename)
+    self.log.debug('Loaded %s points from file: \u2026/%s', format(len(points), '_'), basename)
     return points
 
   def __create_pc_geometry(self) -> None:
@@ -233,7 +233,8 @@ class App:
       __start_ts = datetime.now()
       self.pc = self.pc.voxel_down_sample(self.args.voxel_size)
       __delta_seconds = (datetime.now() - __start_ts).total_seconds()
-      self.log.info('Downsampled point cloud geometry %sin %.3f s', a, __delta_seconds)
+      self.log.info('Downsampled point cloud geometry %sto %s points in %.3f s', a,
+                    format(len(self.pc.points), '_'), __delta_seconds)
 
     if not self.args.no_exe:
       self.vis.add_geometry(self.pc)
@@ -299,6 +300,7 @@ class App:
   def __del__(self) -> None:
     """ cleanup """
     try:
+      self.log.debug('Shutting down...')
       self.pc.clear()
       self.vis.destroy_window()
     except AttributeError: # --no-exe case
