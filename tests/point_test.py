@@ -47,3 +47,12 @@ def test_from_string_hard():
 
   factory = PointFactory('{?},{x},{y},{z},{?},{?},{?},{id}')
   p = factory('1798,-1008.445443,968.787257,52.500958,2,3,5,-1')
+
+
+def test_from_string_with_source():
+  factory = PointFactory('{x},{y},{z},{X},{Y},{Z}')
+  p = factory('1,2,3,4,5,6')
+  assert p == Point(5, 7, 9)
+
+  p = factory('0,0,0,4,5,6')
+  assert p == Point(4, 5, 6)
