@@ -29,3 +29,6 @@
 - added `--voxel-size` as an alternative to `--frac`
 - `--downsample` option to feed back the downsampling onto the saved file (previously, downsampling was only applied to the rendering)
 - delayed import of open3d to speed up the cli
+- made the "=" in "<=" for `--only` optional
+- added "{X}", "{Y}" and "{Z}" to the pattern for the config file
+- if both "source_xyz" and "{X}", "{Y}" and "{Z}" are present, the origin takes both into account
