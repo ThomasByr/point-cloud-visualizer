@@ -6,6 +6,15 @@ from .fmt import *
 
 __all__ = ['init_logger']
 
+try:
+  import colorama # type: ignore
+
+  colorama.init()
+except (ImportError, OSError):
+  HAS_COLORAMA = False
+else:
+  HAS_COLORAMA = True
+
 
 def supports_color():
   """
@@ -21,17 +30,15 @@ def supports_color():
     """
     try:
       # winreg is only available on Windows.
-      import winreg
+      import winreg # pylint: disable=import-outside-toplevel
     except ImportError:
       return False
-    else:
-      try:
-        reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Console")
-        reg_key_value, _ = winreg.QueryValueEx(reg_key, "VirtualTerminalLevel")
-      except FileNotFoundError:
-        return False
-      else:
-        return reg_key_value == 1
+    try:
+      reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Console")
+      reg_key_value, _ = winreg.QueryValueEx(reg_key, "VirtualTerminalLevel")
+    except FileNotFoundError:
+      return False
+    return reg_key_value == 1
 
   # isatty is not always implemented, #6223.
   is_a_tty = hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
