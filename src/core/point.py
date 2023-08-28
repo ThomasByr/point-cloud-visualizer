@@ -4,6 +4,7 @@ import re
 import random
 from functools import lru_cache
 
+import logging
 import numpy as np
 
 __all__ = ['Point', 'PointFactory']
@@ -273,10 +274,13 @@ class PointFactory:
     - `{Z}`: the z coordinate of the source point (float)
     - `{?}`: any field that would be ignored
     """
+    self.log = logging.getLogger('factory')
     self.__fmt = fmt
     self.__make_groups()
 
   def __make_groups(self):
+    self.log.debug(f'Received fmt string : {self.__fmt}')
+
     self.__fmt = self.__fmt.replace('{x}', r'(?P<x>[-+]?[0-9]*\.?[0-9]+)')
     self.__fmt = self.__fmt.replace('{y}', r'(?P<y>[-+]?[0-9]*\.?[0-9]+)')
     self.__fmt = self.__fmt.replace('{z}', r'(?P<z>[-+]?[0-9]*\.?[0-9]+)')

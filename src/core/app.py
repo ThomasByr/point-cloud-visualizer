@@ -59,7 +59,8 @@ class App:
     )
 
     log_lvl = logging.DEBUG if self.args.verbose else logging.INFO
-    self.log = init_logger(log_lvl)
+    init_logger(log_lvl)
+    self.log = logging.getLogger('core.App')
     self.log.debug('Received json config file path (%s)', self.args.cfg)
     if not os.path.isfile(self.args.cfg):
       self.log.critical('Invalid json config file path supplied (%s)', self.args.cfg)
@@ -82,9 +83,6 @@ class App:
 
     self.__setup() # setup the application
     self.log.info('Application setup complete')
-
-    # run the gui
-    self.__run()
 
   def __check_args(self, args: Namespace) -> None:
     """
@@ -290,7 +288,7 @@ class App:
     # save the point cloud if needed
     self.__save_pc()
 
-  def __run(self) -> None:
+  def run(self) -> None:
     """
     run the gui
     """

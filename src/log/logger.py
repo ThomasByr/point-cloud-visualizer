@@ -59,25 +59,23 @@ def supports_color():
   # yapf: enable
 
 
-def init_logger(log_lvl: int = logging.INFO) -> logging.Logger:
+def init_logger(log_lvl: int = logging.INFO) -> None:
   """
-  Initializes the logger for the application
+  Initializes the logger for the application\\
+  This sets the global configuration for the logger
 
   ## Parameters
   - `log_lvl` - int, (optional)
   the logging level (see `logging` module for more info)
   defaults to `logging.INFO`
-
-  ## Returns
-  `logging.Logger` - a new logger on the root level
   """
-  logger = logging.getLogger('pcv')
-  logger.setLevel(log_lvl)
 
   # create console handler with a higher log level
   console_handler = logging.StreamHandler()
   console_handler.setLevel(log_lvl)
   console_handler.setFormatter(UsefulFormatter(colored_output=supports_color()))
 
-  logger.addHandler(console_handler)
-  return logger
+  logging.basicConfig(
+    level=log_lvl,
+    handlers=[console_handler],
+  )
