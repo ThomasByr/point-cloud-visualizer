@@ -77,5 +77,6 @@ def init_logger(log_lvl: int = logging.INFO) -> None:
 
   logging.basicConfig(
     level=log_lvl,
+    style='%',
     handlers=[console_handler],
   )

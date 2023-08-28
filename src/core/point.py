@@ -279,7 +279,7 @@ class PointFactory:
     self.__make_groups()
 
   def __make_groups(self):
-    self.log.debug(f'Received fmt string : {self.__fmt}')
+    self.log.debug('Received fmt string : %s', self.__fmt)
 
     self.__fmt = self.__fmt.replace('{x}', r'(?P<x>[-+]?[0-9]*\.?[0-9]+)')
     self.__fmt = self.__fmt.replace('{y}', r'(?P<y>[-+]?[0-9]*\.?[0-9]+)')
