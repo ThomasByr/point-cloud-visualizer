@@ -53,9 +53,14 @@ Allowed fields for the `pattern` property are (`x`, `y`, `z` are mandatory) :
 - `{r}` : red color component (int 0..=255)
 - `{g}` : green color component '''
 - `{b}` : blue color component '''
-- `{id}` : id of the object (int)(\*)
+- `{X}` : the x coordinate of the source point (float)  (\*)
+- `{Y}` : the y coordinate of the source point (float)
+- `{Z}` : the z coordinate of the source point (float)
+- `{id}` : id of the object (int)(\*\*)
 
-(\*) _the id will be used to color the points in rendering if all color components are omitted_
+(\*) _if one of `{X}`, `{Y}` or `{Z}` is specified, all of them must be_
+
+(\*\*) _the id will be used to color the points in rendering if all color components are omitted_
 
 `pattern` and `skip_first_line` fields can be overwritten in the `configs` array if needed. `source_xyz` is the position of the sensor in the scene and only `file_path` is not set by default
 
@@ -214,6 +219,7 @@ Please read the [changelog](changelog.md) file for the full history !
 - added `--voxel-size` as an alternative to `--frac`
 - `--downsample` option to feed back the downsampling onto the saved file (previously, downsampling was only applied to the rendering)
 - delayed import of open3d to speed up the cli
+- complete refactoring of the logging system + check for color support
 - made the "=" in "<=" for `--only` optional
 - added "{X}", "{Y}" and "{Z}" to the pattern for the config file
 - if both "source_xyz" and "{X}", "{Y}" and "{Z}" are present, the origin takes both into account
