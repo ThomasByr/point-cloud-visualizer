@@ -44,4 +44,4 @@ if __name__ == '__main__':
   from src.utils import parser
   n = parser().parse_args() # parse arguments before importing App
   from src.core import App  # also imports open3d and numpy which are slow
-  App(n)                    # instantiate and run App (check args here)
+  App(n).run()              # instantiate and run App (check args here)
