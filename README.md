@@ -186,6 +186,7 @@ This project also includes the following notable packages and libraries:
 - [Open3d](http://www.open3d.org/) (MIT License)
 - [Numpy](https://numpy.org/) (BSD-3-Clause License)
 - [PyJson5](https://github.com/Kijewski/pyjson5) (Apache License 2.0)
+- [alive_progress](https://github.com/rsalmei/alive-progress) (MIT License)
 
 ## 🔄 Changelog
 
@@ -233,7 +234,7 @@ Please read the [changelog](changelog.md) file for the full history !
 
 - [ ] parallelize the point cloud loading from different files
 - [ ] add support for other file formats (las, ply, etc.)
-- [x] `{X}`, `{Y}` and `{Z}` fields in pattern for the position of the sensor
+- [x] `{X}`, `{Y}` and `{Z}` fields in pattern for the position of the sensor (v0.3.5)
 
 **Known Bugs** (latest fix)
 
