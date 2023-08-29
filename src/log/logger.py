@@ -59,7 +59,7 @@ def supports_color():
   # yapf: enable
 
 
-def init_logger(log_lvl: int = logging.INFO) -> None:
+def init_logger(log_lvl: int = logging.INFO) -> bool:
   """
   Initializes the logger for the application\\
   This sets the global configuration for the logger
@@ -68,15 +68,20 @@ def init_logger(log_lvl: int = logging.INFO) -> None:
   - `log_lvl` - int, (optional)
   the logging level (see `logging` module for more info)
   defaults to `logging.INFO`
+
+  ## Returns
+  - bool - if supports color
   """
+  color = supports_color()
 
   # create console handler with a higher log level
   console_handler = logging.StreamHandler()
   console_handler.setLevel(log_lvl)
-  console_handler.setFormatter(UsefulFormatter(colored_output=supports_color()))
+  console_handler.setFormatter(UsefulFormatter(colored_output=color))
 
   logging.basicConfig(
     level=log_lvl,
     style='%',
     handlers=[console_handler],
   )
+  return color
