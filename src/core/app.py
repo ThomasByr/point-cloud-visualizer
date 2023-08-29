@@ -16,8 +16,12 @@ from open3d import visualization
 from open3d import geometry
 from open3d import utility
 
+from termcolor import colored
 import pyjson5
 import numpy as np
+from alive_progress import alive_it, config_handler
+from alive_progress.animations.bars import bar_factory
+from alive_progress.animations.spinners import frame_spinner_factory
 
 from .config import Config
 from .point import *
@@ -59,12 +63,16 @@ class App:
     )
 
     log_lvl = logging.DEBUG if self.args.verbose else logging.INFO
-    init_logger(log_lvl)
+    supports_color = init_logger(log_lvl)
     self.log = logging.getLogger('core.App')
     self.log.debug('Received json config file path (%s)', self.args.cfg)
     if not os.path.isfile(self.args.cfg):
       self.log.critical('Invalid json config file path supplied (%s)', self.args.cfg)
       sys.exit(1)
+
+    __bar = bar_factory('\u2501', borders=(' ', ' '), background=' ')
+    __spinner = frame_spinner_factory([colored(p, 'cyan') if supports_color else p for p in '⠁⠈⠐⠠⢀⡀⠄⠂'])
+    config_handler.set_global(length=40, max_cols=110, enrich_print=False, bar=__bar, spinner=__spinner)
 
     self.vis: visualization.Visualizer = None
     self.pc: geometry.PointCloud = geometry.PointCloud()  # point cloud geometry
@@ -161,7 +169,7 @@ class App:
   def __parse_files(self, cfgs: list[Config]) -> None:
     """
     initially parse the files and store them in the database
-    
+
     ## Parameters
     ```py
     >>> files : list[Config]
@@ -169,7 +177,7 @@ class App:
     list of configs
     """
     start_ts = datetime.now()
-    for cfg in cfgs:                              # get the points from all the files
+    for cfg in alive_it(cfgs):                    # get the points from each file
       self.points.extend(self.__load_points(cfg)) # load (somewhat slow)
     end_ts = datetime.now()
 
@@ -257,9 +265,7 @@ class App:
       Process(target=__save_npy, args=(self.args.save,)).start()
 
   def __setup(self) -> None:
-    """
-    setup the application
-    """
+    """ setup the application """
     # load the json file and create the configs
     raw_data = None
     with open(self.args.cfg, 'r', encoding='utf-8') as f:
