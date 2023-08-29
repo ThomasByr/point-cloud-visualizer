@@ -223,6 +223,7 @@ Please read the [changelog](changelog.md) file for the full history !
 - made the "=" in "<=" for `--only` optional
 - added "{X}", "{Y}" and "{Z}" to the pattern for the config file
 - if both "source_xyz" and "{X}", "{Y}" and "{Z}" are present, the origin takes both into account
+- new alive progress indicator based on pip (see [alive-progress](https://github.com/rsalmei/alive-progress))
 
 </details>
 
@@ -239,3 +240,4 @@ Please read the [changelog](changelog.md) file for the full history !
 - main thread is blocked while the gui is running
   - only manual closing of the window is possible
   - signal handling is not working
+- alive progress bar does not supports color
