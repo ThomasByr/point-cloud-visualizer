@@ -19,7 +19,10 @@ def parse_int_set(inputstr='') -> set[int]:
       if i.startswith('<='):
         i = f'1-{i[2:]}'
       elif i.startswith('<'):
-        i = f'1-{int(i[1:]) - 1}'
+        try:
+          i = f'1-{int(i[1:]) - 1}'
+        except: # pylint: disable=bare-except
+          invalid.add(i)
 
     try:
       # typically tokens are plain old integers
