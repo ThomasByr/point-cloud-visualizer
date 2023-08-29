@@ -33,3 +33,4 @@
 - made the "=" in "<=" for `--only` optional
 - added "{X}", "{Y}" and "{Z}" to the pattern for the config file
 - if both "source_xyz" and "{X}", "{Y}" and "{Z}" are present, the origin takes both into account
+- new alive progress indicator based on pip (see [alive-progress](https://github.com/rsalmei/alive-progress))
