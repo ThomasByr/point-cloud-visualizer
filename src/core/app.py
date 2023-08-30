@@ -35,7 +35,7 @@ __all__ = ['App']
 class Args:
   verbose: bool            # verbose logging
   cbid: bool               # force color by id
-  cfg: str | None          # config path
+  cfg: str                 # config path
   frac: float | None       # fraction of points to render
   voxel_size: float | None # voxel size for downsampling
   downsample: bool         # downsample based on either voxel size or fraction
@@ -278,9 +278,24 @@ class App:
           'Failed to parse json config file : '
           'maximum nesting level could be reached, please check your file\n%s', e)
         sys.exit(1)
-    default: dict[str, Any] = raw_data['default']
-    configs: list[dict[str, Any]] = raw_data['configs']
-    cfgs = [Config.from_json(json=cfg, **default) for cfg in configs]
+    if not raw_data:
+      self.log.critical('Failed to parse %s : empty file', self.args.cfg)
+      sys.exit(1)
+    default: dict[str, Any] = None
+    configs: list[dict[str, Any]] = None
+    try:
+      default = raw_data['default']
+      configs = raw_data['configs']
+    except KeyError as e:
+      self.log.critical('Failed to parse %s : %s', self.args.cfg, e)
+      sys.exit(1)
+    cfgs: list[Config] = []
+    try:
+      for cfg in configs:
+        cfgs.append(Config.from_json(json=cfg, **default))
+    except ValueError as e:
+      self.log.critical('Failed to parse config n°%d : %s', len(cfgs), e)
+      sys.exit(1)
 
     fset: list[int] = None
     if self.args.only and any(map(lambda x: x > len(cfgs), self.args.only)): # pylint: disable=bad-builtin
