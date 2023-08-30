@@ -75,7 +75,7 @@ def init_logger(log_lvl: int = logging.INFO) -> bool:
   color = supports_color()
 
   # create console handler with a higher log level
-  console_handler = logging.StreamHandler()
+  console_handler = UselessHandler()
   console_handler.setLevel(log_lvl)
   console_handler.setFormatter(UsefulFormatter(colored_output=color))
 

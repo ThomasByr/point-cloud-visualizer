@@ -68,7 +68,6 @@ class App:
     self.log.debug('Received json config file path (%s)', self.args.cfg)
     if not os.path.isfile(self.args.cfg):
       self.log.critical('Invalid json config file path supplied (%s)', self.args.cfg)
-      sys.exit(1)
 
     __bar = bar_factory('\u2501', borders=(' ', ' '), background=' ')
     __spinner = frame_spinner_factory([colored(p, 'cyan') if supports_color else p for p in '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'])
@@ -144,7 +143,6 @@ class App:
 
     if len(found) == 0:
       self.log.critical('No json config file found in file tree')
-      sys.exit(1)
     return found.pop()
 
   def __on_end(self, sig: int, _: Any, /) -> None:
@@ -207,14 +205,12 @@ class App:
 
             self.log.critical('Failed to parse line: %s (%s:%d)\n%s', line, cfg.file_path,
                               len(self.points) + int(cfg.skip_first_line) - index, e)
-            sys.exit(1)
 
     except FileNotFoundError as e:
       self.log.error('Skipping unknown file: %s', e)
       return
     except Exception as e:                                  # pylint: disable=broad-except
       self.log.critical('Failed to read file: %s\n%s', cfg.file_path, e)
-      sys.exit(1)
     self.log.debug('Loaded %s points from file: \u2026/%s',
                    format(len(self.points) + int(cfg.skip_first_line) - index, '_'), basename)
 
@@ -277,10 +273,8 @@ class App:
         self.log.critical(
           'Failed to parse json config file : '
           'maximum nesting level could be reached, please check your file\n%s', e)
-        sys.exit(1)
     if not raw_data:
       self.log.critical('Failed to parse %s : empty file', self.args.cfg)
-      sys.exit(1)
     default: dict[str, Any] = None
     configs: list[dict[str, Any]] = None
     try:
@@ -288,14 +282,12 @@ class App:
       configs = raw_data['configs']
     except KeyError as e:
       self.log.critical('Failed to parse %s : %s', self.args.cfg, e)
-      sys.exit(1)
     cfgs: list[Config] = []
     try:
       for cfg in configs:
         cfgs.append(Config.from_json(json=cfg, **default))
     except ValueError as e:
       self.log.critical('Failed to parse config n°%d : %s', len(cfgs), e)
-      sys.exit(1)
 
     fset: list[int] = None
     if self.args.only and any(map(lambda x: x > len(cfgs), self.args.only)): # pylint: disable=bad-builtin

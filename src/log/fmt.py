@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import sys
+
 import logging
 from typing import Any
 from typing_extensions import override
 from termcolor import colored
 
-__all__ = ['UsefulFormatter']
+__all__ = ['UsefulFormatter', 'UselessHandler']
 
 
 def formatter(
@@ -42,3 +44,12 @@ class UsefulFormatter(logging.Formatter):
     log_fmt = formats.get(record.levelno)
     fmt = logging.Formatter(log_fmt, self.dt_fmt, style='%')
     return fmt.format(record)
+
+
+class UselessHandler(logging.StreamHandler):
+
+  @override
+  def emit(self, record: logging.LogRecord) -> None:
+    super().emit(record)
+    if record.levelno >= logging.CRITICAL: # exit on critical errors
+      sys.exit(1)
