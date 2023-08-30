@@ -19,7 +19,7 @@ from open3d import utility
 from termcolor import colored
 import pyjson5
 import numpy as np
-from alive_progress import alive_it, config_handler
+from alive_progress import alive_it, alive_bar, config_handler
 from alive_progress.animations.bars import bar_factory
 from alive_progress.animations.spinners import frame_spinner_factory
 
@@ -71,7 +71,7 @@ class App:
       sys.exit(1)
 
     __bar = bar_factory('\u2501', borders=(' ', ' '), background=' ')
-    __spinner = frame_spinner_factory([colored(p, 'cyan') if supports_color else p for p in '⠁⠈⠐⠠⢀⡀⠄⠂'])
+    __spinner = frame_spinner_factory([colored(p, 'cyan') if supports_color else p for p in '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'])
     config_handler.set_global(length=40, max_cols=110, enrich_print=False, bar=__bar, spinner=__spinner)
 
     self.vis: visualization.Visualizer = None
@@ -177,17 +177,17 @@ class App:
     list of configs
     """
     start_ts = datetime.now()
-    for cfg in alive_it(cfgs):                    # get the points from each file
-      self.points.extend(self.__load_points(cfg)) # load (somewhat slow)
+    for cfg in alive_it(cfgs): # get the points from each file
+      self.__load_points(cfg)  # load (somewhat slow)
     end_ts = datetime.now()
 
     delta_seconds = (end_ts - start_ts).total_seconds()
     self.log.info('Parsed %s points in %.3f s', format(len(self.points), '_'), delta_seconds)
 
-  def __load_points(self, cfg: Config) -> list[Point]:
-    points: list[Point] = []                    # list of points
+  def __load_points(self, cfg: Config) -> None:
     offset = Point(*cfg.source_xyz, *([0] * 4)) # offset location (r,g,b,id to 0 for add method)
     basename = os.path.basename(cfg.file_path)  # basename for logging
+    index = len(self.points)                    # number of points already loaded
     self.log.debug('Loading file: \u2026/%s', basename)
     self.log.debug('Offset: %s', offset)
     try:
@@ -195,27 +195,28 @@ class App:
 
         factory = PointFactory(cfg.pattern) # just so that the fmt is not being parsed at every line
         start = True                        # skip the first line if needed (should be the same at casting bool to int)
-        index = np.uint32(0)                # index of the current line (for logging)
 
         for line in f:
-          index += 1
           if start == cfg.skip_first_line:
             start = False
             continue
           try:
-            points.append(factory(line) + offset)
+            self.points.append(factory(line) + offset)
+
           except Exception as e: # pylint: disable=broad-except
-            self.log.critical('Failed to parse line: %s (%s:%d)\n%s', line, cfg.file_path, index, e)
+
+            self.log.critical('Failed to parse line: %s (%s:%d)\n%s', line, cfg.file_path,
+                              len(self.points) + int(cfg.skip_first_line) - index, e)
             sys.exit(1)
 
     except FileNotFoundError as e:
       self.log.error('Skipping unknown file: %s', e)
-      return []
-    except Exception as e: # pylint: disable=broad-except
+      return
+    except Exception as e:                                  # pylint: disable=broad-except
       self.log.critical('Failed to read file: %s\n%s', cfg.file_path, e)
       sys.exit(1)
-    self.log.debug('Loaded %s points from file: \u2026/%s', format(len(points), '_'), basename)
-    return points
+    self.log.debug('Loaded %s points from file: \u2026/%s',
+                   format(len(self.points) + int(cfg.skip_first_line) - index, '_'), basename)
 
   def __create_pc_geometry(self) -> None:
     points = self.points
@@ -229,8 +230,9 @@ class App:
       self.log.info('Pulled %s points randomly %sin %.3f s', format(len(points), '_'), a, __delta_seconds)
 
     start_ts = datetime.now()
-    self.pc.points = utility.Vector3dVector(map(lambda p: p.get_xyz(), points))                 # pylint: disable=bad-builtin
-    self.pc.colors = utility.Vector3dVector(map(lambda p: p.get_color(self.args.cbid), points)) # pylint: disable=bad-builtin
+    with alive_bar(title='please wait ', bar=None, receipt=False, monitor=False, elapsed=False, stats=False):
+      self.pc.points = utility.Vector3dVector(map(lambda p: p.get_xyz(), points))                 # pylint: disable=bad-builtin
+      self.pc.colors = utility.Vector3dVector(map(lambda p: p.get_color(self.args.cbid), points)) # pylint: disable=bad-builtin
     end_ts = datetime.now()
     delta_seconds = (end_ts - start_ts).total_seconds()
     self.log.info('Created point cloud geometry in %.3f s', delta_seconds)
